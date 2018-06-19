@@ -1,8 +1,8 @@
 #!/bin/bash
 for x in "-o OpenBCI" "-o pothosware" "-u xloem" "-u fuzzyTew" "-u baffo32" "-o guardianproject" "-u mafintosh" "-u joehand" "-o datproject" "-o sccn" "-o datprotocol" "-o datrs" "-o equalitie" "-u dominictarr" "-o ssbc" "-u clehner" "-u noffle" "-o gnuradio" "-o osmocom" "-o bcoin-org" "-o bitcoin", "-o common-blockchain" "-o blockai-unofficial" "-o bitcoinjs" "-o bitpay" "-o cryptocoinjs"
 do
-	#node_modules/github-mirror/src/cli.js -t eb62f4daea9cea6cb866ba6c017ca92c6e96970f $x -c github.${x##* }.cache -d github
-	node_modules/github-mirror/src/cli.js -t eb62f4daea9cea6cb866ba6c017ca92c6e96970f $x -f -d github
+	#node_modules/github-mirror/src/cli.js -t $(<github.token) $x -c github.${x##* }.cache -d github
+	node_modules/github-mirror/src/cli.js -t $(<github.token) $x -f -d github
 done
 
 export GIT_ASKPASS=echo
