@@ -1,0 +1,14 @@
+#!/usr/bin/debmirror --config-file
+$progress=1;
+$getcontents=1;
+$diff_mode="use";
+
+$mirrordir="whonix";
+$host="deb.whonix.org";
+$remoteroot="";
+$download_method="https";
+@dists="stretch,jessie";
+@arches="amd64";
+$keyring="trustedkeys.gpg";
+
+

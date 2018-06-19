@@ -1,0 +1,1635 @@
+<!doctype html >
+<!--[if IE 8]>    <html class="ie8" lang="en"> <![endif]-->
+<!--[if IE 9]>    <html class="ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html lang="en-US" prefix="og: http://ogp.me/ns#"> <!--<![endif]-->
+<head>
+    <title>How To Create An NPM Repository Mirror - Remote CTO</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="pingback" href="http://www.remotecto.net/xmlrpc.php" />
+    <meta property="og:image" content="http://www.remotecto.net/wp-content/uploads/2013/06/npm.png" /><meta name="author" content="rus">
+
+<!-- This site is optimized with the Yoast SEO plugin v4.3 - https://yoast.com/wordpress/plugins/seo/ -->
+<link rel="canonical" href="http://www.remotecto.net/2013/06/20/how-to-create-an-npm-repository-mirror/" />
+<meta property="og:locale" content="en_US" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="How To Create An NPM Repository Mirror - Remote CTO" />
+<meta property="og:description" content="We use Node.js a LOT, which means we do npm install a LOT. And npm is pretty terrible, with horrible dependency handling so we can end up requesting hundreds of dependent modules with it&#8217;s recursive patten e.g. for just one of our projects we can end up with paths like ./node_modules/bcrypt/node_modules/nodeunit/node_modules/should/node_modules/mocha/node_modules/glob/node_modules/minimatch/node_modules/sigmund/node_modules/tap/node_modules [root@hmon workspace]# find . &hellip;" />
+<meta property="og:url" content="http://www.remotecto.net/2013/06/20/how-to-create-an-npm-repository-mirror/" />
+<meta property="og:site_name" content="Remote CTO" />
+<meta property="article:tag" content="mirror" />
+<meta property="article:tag" content="nodejs" />
+<meta property="article:tag" content="npm" />
+<meta property="article:tag" content="repository" />
+<meta property="article:section" content="Node.JS" />
+<meta property="article:published_time" content="2013-06-20T15:18:58+00:00" />
+<meta property="article:modified_time" content="2013-06-21T08:53:36+00:00" />
+<meta property="og:updated_time" content="2013-06-21T08:53:36+00:00" />
+<meta property="og:image" content="http://www.remotecto.net/wp-content/uploads/2013/06/npm.png" />
+<meta property="og:image:width" content="518" />
+<meta property="og:image:height" content="202" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:description" content="We use Node.js a LOT, which means we do npm install a LOT. And npm is pretty terrible, with horrible dependency handling so we can end up requesting hundreds of dependent modules with it&#8217;s recursive patten e.g. for just one of our projects we can end up with paths like ./node_modules/bcrypt/node_modules/nodeunit/node_modules/should/node_modules/mocha/node_modules/glob/node_modules/minimatch/node_modules/sigmund/node_modules/tap/node_modules [root@hmon workspace]# find . [&hellip;]" />
+<meta name="twitter:title" content="How To Create An NPM Repository Mirror - Remote CTO" />
+<meta name="twitter:image" content="http://www.remotecto.net/wp-content/uploads/2013/06/npm.png" />
+<!-- / Yoast SEO plugin. -->
+
+<link rel='dns-prefetch' href='//fonts.googleapis.com' />
+<link rel='dns-prefetch' href='//s.w.org' />
+<link rel="alternate" type="application/rss+xml" title="Remote CTO &raquo; Feed" href="http://www.remotecto.net/feed/" />
+<link rel="alternate" type="application/rss+xml" title="Remote CTO &raquo; Comments Feed" href="http://www.remotecto.net/comments/feed/" />
+<link rel="alternate" type="application/rss+xml" title="Remote CTO &raquo; How To Create An NPM Repository Mirror Comments Feed" href="http://www.remotecto.net/2013/06/20/how-to-create-an-npm-repository-mirror/feed/" />
+		<script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.2.1\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/2.2.1\/svg\/","svgExt":".svg","source":{"concatemoji":"http:\/\/www.remotecto.net\/wp-includes\/js\/wp-emoji-release.min.js?ver=4.7.2"}};
+			!function(a,b,c){function d(a){var b,c,d,e,f=String.fromCharCode;if(!k||!k.fillText)return!1;switch(k.clearRect(0,0,j.width,j.height),k.textBaseline="top",k.font="600 32px Arial",a){case"flag":return k.fillText(f(55356,56826,55356,56819),0,0),!(j.toDataURL().length<3e3)&&(k.clearRect(0,0,j.width,j.height),k.fillText(f(55356,57331,65039,8205,55356,57096),0,0),b=j.toDataURL(),k.clearRect(0,0,j.width,j.height),k.fillText(f(55356,57331,55356,57096),0,0),c=j.toDataURL(),b!==c);case"emoji4":return k.fillText(f(55357,56425,55356,57341,8205,55357,56507),0,0),d=j.toDataURL(),k.clearRect(0,0,j.width,j.height),k.fillText(f(55357,56425,55356,57341,55357,56507),0,0),e=j.toDataURL(),d!==e}return!1}function e(a){var c=b.createElement("script");c.src=a,c.defer=c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var f,g,h,i,j=b.createElement("canvas"),k=j.getContext&&j.getContext("2d");for(i=Array("flag","emoji4"),c.supports={everything:!0,everythingExceptFlag:!0},h=0;h<i.length;h++)c.supports[i[h]]=d(i[h]),c.supports.everything=c.supports.everything&&c.supports[i[h]],"flag"!==i[h]&&(c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&c.supports[i[h]]);c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&!c.supports.flag,c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.everything||(g=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",g,!1),a.addEventListener("load",g,!1)):(a.attachEvent("onload",g),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),f=c.source||{},f.concatemoji?e(f.concatemoji):f.wpemoji&&f.twemoji&&(e(f.twemoji),e(f.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script>
+		<style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style>
+<link rel='stylesheet' id='crayon-css'  href='http://www.remotecto.net/wp-content/plugins/crayon-syntax-highlighter/css/min/crayon.min.css?ver=_2.7.2_beta' type='text/css' media='all' />
+<link rel='stylesheet' id='rs-plugin-settings-css'  href='http://www.remotecto.net/wp-content/plugins/revslider/public/assets/css/settings.css?ver=5.2.5.1' type='text/css' media='all' />
+<style id='rs-plugin-settings-inline-css' type='text/css'>
+#rs-demo-id {}
+</style>
+<link rel='stylesheet' id='google_font_open_sans-css'  href='http://fonts.googleapis.com/css?family=Open+Sans%3A300italic%2C400italic%2C600italic%2C400%2C600%2C700&#038;ver=4.7.2' type='text/css' media='all' />
+<link rel='stylesheet' id='google_font_roboto-css'  href='http://fonts.googleapis.com/css?family=Roboto%3A500%2C400italic%2C700%2C900%2C500italic%2C400%2C300&#038;ver=4.7.2' type='text/css' media='all' />
+<link rel='stylesheet' id='js_composer_front-css'  href='http://www.remotecto.net/wp-content/plugins/js_composer/assets/css/js_composer.min.css?ver=4.12' type='text/css' media='all' />
+<link rel='stylesheet' id='td-theme-css'  href='http://www.remotecto.net/wp-content/themes/Newspaper/style.css?ver=7.3c' type='text/css' media='all' />
+<link rel='stylesheet' id='td-theme-child-css'  href='http://www.remotecto.net/wp-content/themes/idimmu-newspaper/style.css?ver=7.3c' type='text/css' media='all' />
+<script type='text/javascript' src='http://www.remotecto.net/wp-includes/js/jquery/jquery.js?ver=1.12.4'></script>
+<script type='text/javascript' src='http://www.remotecto.net/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.4.1'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var CrayonSyntaxSettings = {"version":"_2.7.2_beta","is_admin":"0","ajaxurl":"http:\/\/www.remotecto.net\/wp-admin\/admin-ajax.php","prefix":"crayon-","setting":"crayon-setting","selected":"crayon-setting-selected","changed":"crayon-setting-changed","special":"crayon-setting-special","orig_value":"data-orig-value","debug":""};
+var CrayonSyntaxStrings = {"copy":"Press %s to Copy, %s to Paste","minimize":"Click To Expand Code"};
+/* ]]> */
+</script>
+<script type='text/javascript' src='http://www.remotecto.net/wp-content/plugins/crayon-syntax-highlighter/js/min/crayon.min.js?ver=_2.7.2_beta'></script>
+<script type='text/javascript' src='http://www.remotecto.net/wp-content/plugins/revslider/public/assets/js/jquery.themepunch.tools.min.js?ver=5.2.5.1'></script>
+<script type='text/javascript' src='http://www.remotecto.net/wp-content/plugins/revslider/public/assets/js/jquery.themepunch.revolution.min.js?ver=5.2.5.1'></script>
+<script type='text/javascript' src='http://www.remotecto.net/wp-content/plugins/google-analyticator/external-tracking.min.js?ver=6.5.2'></script>
+<link rel='https://api.w.org/' href='http://www.remotecto.net/wp-json/' />
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="http://www.remotecto.net/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="http://www.remotecto.net/wp-includes/wlwmanifest.xml" /> 
+<meta name="generator" content="WordPress 4.7.2" />
+<link rel='shortlink' href='http://www.remotecto.net/?p=642' />
+<link rel="alternate" type="application/json+oembed" href="http://www.remotecto.net/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fwww.remotecto.net%2F2013%2F06%2F20%2Fhow-to-create-an-npm-repository-mirror%2F" />
+<link rel="alternate" type="text/xml+oembed" href="http://www.remotecto.net/wp-json/oembed/1.0/embed?url=http%3A%2F%2Fwww.remotecto.net%2F2013%2F06%2F20%2Fhow-to-create-an-npm-repository-mirror%2F&#038;format=xml" />
+<!--[if lt IE 9]><script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+    <meta name="generator" content="Powered by Visual Composer - drag and drop page builder for WordPress."/>
+<!--[if lte IE 9]><link rel="stylesheet" type="text/css" href="http://www.remotecto.net/wp-content/plugins/js_composer/assets/css/vc_lte_ie9.min.css" media="screen"><![endif]--><!--[if IE  8]><link rel="stylesheet" type="text/css" href="http://www.remotecto.net/wp-content/plugins/js_composer/assets/css/vc-ie8.min.css" media="screen"><![endif]--><link rel="amphtml" href="http://www.remotecto.net/2013/06/20/how-to-create-an-npm-repository-mirror/amp/" /><meta name="generator" content="Powered by Slider Revolution 5.2.5.1 - responsive, Mobile-Friendly Slider Plugin for WordPress with comfortable drag and drop interface." />
+
+<!-- JS generated by theme -->
+
+<script>
+    
+    
+
+	    var tdBlocksArray = []; //here we store all the items for the current page
+
+	    //td_block class - each ajax block uses a object of this class for requests
+	    function tdBlock() {
+		    this.id = '';
+		    this.block_type = 1; //block type id (1-234 etc)
+		    this.atts = '';
+		    this.td_column_number = '';
+		    this.td_current_page = 1; //
+		    this.post_count = 0; //from wp
+		    this.found_posts = 0; //from wp
+		    this.max_num_pages = 0; //from wp
+		    this.td_filter_value = ''; //current live filter value
+		    this.is_ajax_running = false;
+		    this.td_user_action = ''; // load more or infinite loader (used by the animation)
+		    this.header_color = '';
+		    this.ajax_pagination_infinite_stop = ''; //show load more at page x
+	    }
+
+
+        // td_js_generator - mini detector
+        (function(){
+            var htmlTag = document.getElementsByTagName("html")[0];
+
+            if ( navigator.userAgent.indexOf("MSIE 10.0") > -1 ) {
+                htmlTag.className += ' ie10';
+            }
+
+            if ( !!navigator.userAgent.match(/Trident.*rv\:11\./) ) {
+                htmlTag.className += ' ie11';
+            }
+
+            if ( /(iPad|iPhone|iPod)/g.test(navigator.userAgent) ) {
+                htmlTag.className += ' td-md-is-ios';
+            }
+
+            var user_agent = navigator.userAgent.toLowerCase();
+            if ( user_agent.indexOf("android") > -1 ) {
+                htmlTag.className += ' td-md-is-android';
+            }
+
+            if ( -1 !== navigator.userAgent.indexOf('Mac OS X')  ) {
+                htmlTag.className += ' td-md-is-os-x';
+            }
+
+            if ( /chrom(e|ium)/.test(navigator.userAgent.toLowerCase()) ) {
+               htmlTag.className += ' td-md-is-chrome';
+            }
+
+            if ( -1 !== navigator.userAgent.indexOf('Firefox') ) {
+                htmlTag.className += ' td-md-is-firefox';
+            }
+
+            if ( -1 !== navigator.userAgent.indexOf('Safari') && -1 === navigator.userAgent.indexOf('Chrome') ) {
+                htmlTag.className += ' td-md-is-safari';
+            }
+
+        })();
+
+
+
+
+        var tdLocalCache = {};
+
+        ( function () {
+            "use strict";
+
+            tdLocalCache = {
+                data: {},
+                remove: function (resource_id) {
+                    delete tdLocalCache.data[resource_id];
+                },
+                exist: function (resource_id) {
+                    return tdLocalCache.data.hasOwnProperty(resource_id) && tdLocalCache.data[resource_id] !== null;
+                },
+                get: function (resource_id) {
+                    return tdLocalCache.data[resource_id];
+                },
+                set: function (resource_id, cachedData) {
+                    tdLocalCache.remove(resource_id);
+                    tdLocalCache.data[resource_id] = cachedData;
+                }
+            };
+        })();
+
+    
+    
+var td_viewport_interval_list=[{"limitBottom":767,"sidebarWidth":228},{"limitBottom":1018,"sidebarWidth":300},{"limitBottom":1140,"sidebarWidth":324}];
+var td_animation_stack_effect="type0";
+var tds_animation_stack=true;
+var td_animation_stack_specific_selectors=".entry-thumb, img";
+var td_animation_stack_general_selectors=".td-animation-stack img, .post img";
+var td_ajax_url="http:\/\/www.remotecto.net\/wp-admin\/admin-ajax.php?td_theme_name=Newspaper&v=7.3";
+var td_get_template_directory_uri="http:\/\/www.remotecto.net\/wp-content\/themes\/Newspaper";
+var tds_snap_menu="";
+var tds_logo_on_sticky="";
+var tds_header_style="";
+var td_please_wait="Please wait...";
+var td_email_user_pass_incorrect="User or password incorrect!";
+var td_email_user_incorrect="Email or username incorrect!";
+var td_email_incorrect="Email incorrect!";
+var tds_more_articles_on_post_enable="";
+var tds_more_articles_on_post_time_to_wait="";
+var tds_more_articles_on_post_pages_distance_from_top=0;
+var tds_theme_color_site_wide="#4db2ec";
+var tds_smart_sidebar="";
+var tdThemeName="Newspaper";
+var td_magnific_popup_translation_tPrev="Previous (Left arrow key)";
+var td_magnific_popup_translation_tNext="Next (Right arrow key)";
+var td_magnific_popup_translation_tCounter="%curr% of %total%";
+var td_magnific_popup_translation_ajax_tError="The content from %url% could not be loaded.";
+var td_magnific_popup_translation_image_tError="The image #%curr% could not be loaded.";
+var td_ad_background_click_link="";
+var td_ad_background_click_target="";
+</script>
+
+<!-- Google Analytics Tracking by Google Analyticator 6.5.2: http://www.videousermanuals.com/google-analyticator/ -->
+<script type="text/javascript">
+    var analyticsFileTypes = [''];
+    var analyticsSnippet = 'disabled';
+    var analyticsEventTracking = 'enabled';
+</script>
+<script type="text/javascript">
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-3420601-1', 'auto');
+ 
+	ga('send', 'pageview');
+</script>
+<noscript><style type="text/css"> .wpb_animate_when_almost_visible { opacity: 1; }</style></noscript></head>
+
+<body class="post-template-default single single-post postid-642 single-format-standard how-to-create-an-npm-repository-mirror wpb-js-composer js-comp-ver-4.12 vc_responsive td-animation-stack-type0 td-full-layout" itemscope="itemscope" itemtype="http://schema.org/WebPage">
+
+        <div class="td-scroll-up"><i class="td-icon-menu-up"></i></div>
+    
+    <div class="td-menu-background"></div>
+<div id="td-mobile-nav">
+    <div class="td-mobile-container">
+        <!-- mobile menu top section -->
+        <div class="td-menu-socials-wrap">
+            <!-- socials -->
+            <div class="td-menu-socials">
+                
+        <span class="td-social-icon-wrap">
+            <a target="_blank" href="https://instagram.com/ruspow/" title="Instagram">
+                <i class="td-icon-font td-icon-instagram"></i>
+            </a>
+        </span>
+        <span class="td-social-icon-wrap">
+            <a target="_blank" href="http://www.last.fm/user/ruspow" title="Lastfm">
+                <i class="td-icon-font td-icon-lastfm"></i>
+            </a>
+        </span>
+        <span class="td-social-icon-wrap">
+            <a target="_blank" href="https://www.reddit.com/user/ruspow" title="Reddit">
+                <i class="td-icon-font td-icon-reddit"></i>
+            </a>
+        </span>            </div>
+            <!-- close button -->
+            <div class="td-mobile-close">
+                <a href="#"><i class="td-icon-close-mobile"></i></a>
+            </div>
+        </div>
+
+        <!-- login section -->
+        
+        <!-- menu section -->
+        <div class="td-mobile-content">
+            <div class="menu-primary-menu-container"><ul id="menu-primary-menu" class="td-mobile-main-menu"><li id="menu-item-131" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-first menu-item-131"><a href="http://www.idimmu.net">Home</a></li>
+<li id="menu-item-448" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-448"><a href="http://www.remotecto.net/category/burger-reviews/">Burger Reviews</a></li>
+<li id="menu-item-453" class="menu-item menu-item-type-taxonomy menu-item-object-category current-post-ancestor menu-item-has-children menu-item-453"><a href="http://www.remotecto.net/category/programming/">Programming<i class="td-icon-menu-right td-element-after"></i></a>
+<ul class="sub-menu">
+	<li id="menu-item-454" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-454"><a href="http://www.remotecto.net/category/programming/grails/">Grails</a></li>
+	<li id="menu-item-455" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-455"><a href="http://www.remotecto.net/category/programming/php/">PHP</a></li>
+	<li id="menu-item-456" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-456"><a href="http://www.remotecto.net/category/programming/python/">Python</a></li>
+</ul>
+</li>
+<li id="menu-item-458" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-has-children menu-item-458"><a href="http://www.remotecto.net/category/systems/">Systems<i class="td-icon-menu-right td-element-after"></i></a>
+<ul class="sub-menu">
+	<li id="menu-item-459" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-459"><a href="http://www.remotecto.net/category/systems/apple/">Apple</a></li>
+	<li id="menu-item-460" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-460"><a href="http://www.remotecto.net/category/systems/dell/">Dell</a></li>
+	<li id="menu-item-461" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-461"><a href="http://www.remotecto.net/category/systems/java/">Java</a></li>
+	<li id="menu-item-462" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-462"><a href="http://www.remotecto.net/category/systems/linux/">Linux</a></li>
+	<li id="menu-item-463" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-463"><a href="http://www.remotecto.net/category/systems/redhat/">Redhat</a></li>
+	<li id="menu-item-580" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-580"><a href="http://www.remotecto.net/category/systems/security/">Security</a></li>
+	<li id="menu-item-464" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-464"><a href="http://www.remotecto.net/category/systems/ubuntu/">Ubuntu</a></li>
+	<li id="menu-item-465" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-465"><a href="http://www.remotecto.net/category/systems/windows/">Windows</a></li>
+	<li id="menu-item-467" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-467"><a href="http://www.remotecto.net/category/systems/wordpress-2/">WordPress</a></li>
+</ul>
+</li>
+<li id="menu-item-649" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-649"><a href="http://www.remotecto.net/category/seo/">SEO</a></li>
+<li id="menu-item-466" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-has-children menu-item-466"><a href="http://www.remotecto.net/category/misc/">Misc<i class="td-icon-menu-right td-element-after"></i></a>
+<ul class="sub-menu">
+	<li id="menu-item-449" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-449"><a href="http://www.remotecto.net/category/misc/food/">Food</a></li>
+	<li id="menu-item-451" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-451"><a href="http://www.remotecto.net/category/misc/income-reports/">Income Reports</a></li>
+	<li id="menu-item-450" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-450"><a href="http://www.remotecto.net/category/misc/life/">Life</a></li>
+	<li id="menu-item-457" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-457"><a href="http://www.remotecto.net/category/misc/reviews/">Reviews</a></li>
+	<li id="menu-item-617" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-617"><a href="http://www.remotecto.net/category/misc/crossfit/">CrossFit</a></li>
+</ul>
+</li>
+</ul></div>        </div>
+    </div>
+
+    <!-- register/login section -->
+    </div>    <div class="td-search-background"></div>
+<div class="td-search-wrap-mob">
+	<div class="td-drop-down-search" aria-labelledby="td-header-search-button">
+		<form method="get" class="td-search-form" action="http://www.remotecto.net/">
+			<!-- close button -->
+			<div class="td-search-close">
+				<a href="#"><i class="td-icon-close-mobile"></i></a>
+			</div>
+			<div role="search" class="td-search-input">
+				<span>Search</span>
+				<input id="td-header-search-mob" type="text" value="" name="s" autocomplete="off" />
+			</div>
+		</form>
+		<div id="td-aj-search-mob"></div>
+	</div>
+</div>    
+    
+    <div id="td-outer-wrap">
+    
+        <!--
+Header style 1
+-->
+
+<div class="td-header-wrap td-header-style-1">
+
+    <div class="td-header-top-menu-full">
+        <div class="td-container td-header-row td-header-top-menu">
+            
+    <div class="top-bar-style-1">
+        
+<div class="td-header-sp-top-menu">
+
+
+	<div class="menu-top-container"><ul id="menu-top-menu" class="top-header-menu"><li id="menu-item-423" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-first td-menu-item td-normal-menu menu-item-423"><a href="http://www.remotecto.net/privacy-policy/">Privacy Policy</a></li>
+<li id="menu-item-422" class="menu-item menu-item-type-post_type menu-item-object-page td-menu-item td-normal-menu menu-item-422"><a href="http://www.remotecto.net/contact/">Contact</a></li>
+</ul></div></div>
+            </div>
+
+<!-- LOGIN MODAL -->
+
+                <div  id="login-form" class="white-popup-block mfp-hide mfp-with-anim">
+                    <div class="td-login-wrap">
+                        <a href="#" class="td-back-button"><i class="td-icon-modal-back"></i></a>
+                        <div id="td-login-div" class="td-login-form-div td-display-block">
+                            <div class="td-login-panel-title">Sign in</div>
+                            <div class="td-login-panel-descr">Welcome! Log into your account</div>
+                            <div class="td_display_err"></div>
+                            <div class="td-login-inputs"><input class="td-login-input" type="text" name="login_email" id="login_email" value="" required><label>your username</label></div>
+	                        <div class="td-login-inputs"><input class="td-login-input" type="password" name="login_pass" id="login_pass" value="" required><label>your password</label></div>
+                            <input type="button" name="login_button" id="login_button" class="wpb_button btn td-login-button" value="Login">
+                            <div class="td-login-info-text"><a href="#" id="forgot-pass-link">Forgot your password? Get help</a></div>
+                            
+                        </div>
+
+                        
+
+                         <div id="td-forgot-pass-div" class="td-login-form-div td-display-none">
+                            <div class="td-login-panel-title">Password recovery</div>
+                            <div class="td-login-panel-descr">Recover your password</div>
+                            <div class="td_display_err"></div>
+                            <div class="td-login-inputs"><input class="td-login-input" type="text" name="forgot_email" id="forgot_email" value="" required><label>your email</label></div>
+                            <input type="button" name="forgot_button" id="forgot_button" class="wpb_button btn td-login-button" value="Send My Password">
+                            <div class="td-login-info-text">A password will be e-mailed to you.</div>
+                        </div>
+                    </div>
+                </div>
+                        </div>
+    </div>
+
+    <div class="td-banner-wrap-full td-logo-wrap-full">
+        <div class="td-container td-header-row td-header-header">
+            <div class="td-header-sp-logo">
+                            <a class="td-main-logo" href="http://www.remotecto.net/">
+                <img src="http://www.remotecto.net/wp-content/uploads/2017/02/remotecto.png" alt="Remote CTO" title="Remote CTO"/>
+                <span class="td-visual-hidden">Remote CTO</span>
+            </a>
+                    </div>
+            <div class="td-header-sp-recs">
+                <div class="td-header-rec-wrap">
+    <div class="td-a-rec td-a-rec-id-header  "><a href="/more/codeforcash/"><img src="http://www.remotecto.net/wp-content/uploads/2017/02/remote-cto-code-for-cash-banner.png" /></a></div>
+</div>            </div>
+        </div>
+    </div>
+
+    <div class="td-header-menu-wrap-full">
+        <div class="td-header-menu-wrap td-header-gradient">
+            <div class="td-container td-header-row td-header-main-menu">
+                <div id="td-header-menu" role="navigation">
+    <div id="td-top-mobile-toggle"><a href="#"><i class="td-icon-font td-icon-mobile"></i></a></div>
+    <div class="td-main-menu-logo td-logo-in-header">
+                <a class="td-main-logo" href="http://www.remotecto.net/">
+            <img src="http://www.remotecto.net/wp-content/uploads/2017/02/remotecto.png" alt="Remote CTO" title="Remote CTO"/>
+        </a>
+        </div>
+    <div class="menu-primary-menu-container"><ul id="menu-primary-menu-1" class="sf-menu"><li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-first td-menu-item td-normal-menu menu-item-131"><a href="http://www.idimmu.net">Home</a></li>
+<li class="menu-item menu-item-type-taxonomy menu-item-object-category td-menu-item td-normal-menu menu-item-448"><a href="http://www.remotecto.net/category/burger-reviews/">Burger Reviews</a></li>
+<li class="menu-item menu-item-type-taxonomy menu-item-object-category current-post-ancestor menu-item-has-children td-menu-item td-normal-menu menu-item-453"><a href="http://www.remotecto.net/category/programming/">Programming</a>
+<ul class="sub-menu">
+	<li class="menu-item menu-item-type-taxonomy menu-item-object-category td-menu-item td-normal-menu menu-item-454"><a href="http://www.remotecto.net/category/programming/grails/">Grails</a></li>
+	<li class="menu-item menu-item-type-taxonomy menu-item-object-category td-menu-item td-normal-menu menu-item-455"><a href="http://www.remotecto.net/category/programming/php/">PHP</a></li>
+	<li class="menu-item menu-item-type-taxonomy menu-item-object-category td-menu-item td-normal-menu menu-item-456"><a href="http://www.remotecto.net/category/programming/python/">Python</a></li>
+</ul>
+</li>
+<li class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-has-children td-menu-item td-normal-menu menu-item-458"><a href="http://www.remotecto.net/category/systems/">Systems</a>
+<ul class="sub-menu">
+	<li class="menu-item menu-item-type-taxonomy menu-item-object-category td-menu-item td-normal-menu menu-item-459"><a href="http://www.remotecto.net/category/systems/apple/">Apple</a></li>
+	<li class="menu-item menu-item-type-taxonomy menu-item-object-category td-menu-item td-normal-menu menu-item-460"><a href="http://www.remotecto.net/category/systems/dell/">Dell</a></li>
+	<li class="menu-item menu-item-type-taxonomy menu-item-object-category td-menu-item td-normal-menu menu-item-461"><a href="http://www.remotecto.net/category/systems/java/">Java</a></li>
+	<li class="menu-item menu-item-type-taxonomy menu-item-object-category td-menu-item td-normal-menu menu-item-462"><a href="http://www.remotecto.net/category/systems/linux/">Linux</a></li>
+	<li class="menu-item menu-item-type-taxonomy menu-item-object-category td-menu-item td-normal-menu menu-item-463"><a href="http://www.remotecto.net/category/systems/redhat/">Redhat</a></li>
+	<li class="menu-item menu-item-type-taxonomy menu-item-object-category td-menu-item td-normal-menu menu-item-580"><a href="http://www.remotecto.net/category/systems/security/">Security</a></li>
+	<li class="menu-item menu-item-type-taxonomy menu-item-object-category td-menu-item td-normal-menu menu-item-464"><a href="http://www.remotecto.net/category/systems/ubuntu/">Ubuntu</a></li>
+	<li class="menu-item menu-item-type-taxonomy menu-item-object-category td-menu-item td-normal-menu menu-item-465"><a href="http://www.remotecto.net/category/systems/windows/">Windows</a></li>
+	<li class="menu-item menu-item-type-taxonomy menu-item-object-category td-menu-item td-normal-menu menu-item-467"><a href="http://www.remotecto.net/category/systems/wordpress-2/">WordPress</a></li>
+</ul>
+</li>
+<li class="menu-item menu-item-type-taxonomy menu-item-object-category td-menu-item td-normal-menu menu-item-649"><a href="http://www.remotecto.net/category/seo/">SEO</a></li>
+<li class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-has-children td-menu-item td-normal-menu menu-item-466"><a href="http://www.remotecto.net/category/misc/">Misc</a>
+<ul class="sub-menu">
+	<li class="menu-item menu-item-type-taxonomy menu-item-object-category td-menu-item td-normal-menu menu-item-449"><a href="http://www.remotecto.net/category/misc/food/">Food</a></li>
+	<li class="menu-item menu-item-type-taxonomy menu-item-object-category td-menu-item td-normal-menu menu-item-451"><a href="http://www.remotecto.net/category/misc/income-reports/">Income Reports</a></li>
+	<li class="menu-item menu-item-type-taxonomy menu-item-object-category td-menu-item td-normal-menu menu-item-450"><a href="http://www.remotecto.net/category/misc/life/">Life</a></li>
+	<li class="menu-item menu-item-type-taxonomy menu-item-object-category td-menu-item td-normal-menu menu-item-457"><a href="http://www.remotecto.net/category/misc/reviews/">Reviews</a></li>
+	<li class="menu-item menu-item-type-taxonomy menu-item-object-category td-menu-item td-normal-menu menu-item-617"><a href="http://www.remotecto.net/category/misc/crossfit/">CrossFit</a></li>
+</ul>
+</li>
+</ul></div></div>
+
+
+<div class="td-search-wrapper">
+    <div id="td-top-search">
+        <!-- Search -->
+        <div class="header-search-wrap">
+            <div class="dropdown header-search">
+                <a id="td-header-search-button" href="#" role="button" class="dropdown-toggle " data-toggle="dropdown"><i class="td-icon-search"></i></a>
+                <a id="td-header-search-button-mob" href="#" role="button" class="dropdown-toggle " data-toggle="dropdown"><i class="td-icon-search"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="header-search-wrap">
+	<div class="dropdown header-search">
+		<div class="td-drop-down-search" aria-labelledby="td-header-search-button">
+			<form method="get" class="td-search-form" action="http://www.remotecto.net/">
+				<div role="search" class="td-head-form-search-wrap">
+					<input id="td-header-search" type="text" value="" name="s" autocomplete="off" /><input class="wpb_button wpb_btn-inverse btn" type="submit" id="td-header-search-top" value="Search" />
+				</div>
+			</form>
+			<div id="td-aj-search"></div>
+		</div>
+	</div>
+</div>            </div>
+        </div>
+    </div>
+
+</div><div class="td-main-content-wrap">
+
+    <div class="td-container td-post-template-default ">
+        <div class="td-crumb-container"><div class="entry-crumbs"><span itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a title="" class="entry-crumb" itemprop="url" href="http://www.remotecto.net/"><span itemprop="title">Home</span></a></span> <i class="td-icon-right td-bread-sep"></i> <span itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a title="View all posts in Programming" class="entry-crumb" itemprop="url" href="http://www.remotecto.net/category/programming/"><span itemprop="title">Programming</span></a></span> <i class="td-icon-right td-bread-sep"></i> <span itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a title="View all posts in Node.JS" class="entry-crumb" itemprop="url" href="http://www.remotecto.net/category/programming/node-js/"><span itemprop="title">Node.JS</span></a></span> <i class="td-icon-right td-bread-sep td-bred-no-url-last"></i> <span class="td-bred-no-url-last" itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><meta itemprop="title" content = "How To Create An NPM Repository Mirror"><meta itemprop="url" content = "http://www.remotecto.net/2013/06/20/how-to-create-an-npm-repository-mirror/">How To Create An NPM Repository Mirror</span></div></div>
+
+        <div class="td-pb-row">
+                                    <div class="td-pb-span8 td-main-content" role="main">
+                            <div class="td-ss-main-content">
+                                
+    <article id="post-642" class="post-642 post type-post status-publish format-standard has-post-thumbnail hentry category-node-js tag-mirror tag-nodejs tag-npm tag-repository" itemscope itemtype="http://schema.org/Article">
+        <div class="td-post-header">
+
+            <ul class="td-category"><li class="entry-category"><a  href="http://www.remotecto.net/category/programming/">Programming</a></li><li class="entry-category"><a  href="http://www.remotecto.net/category/programming/node-js/">Node.JS</a></li></ul>
+            <header class="td-post-title">
+                <h1 class="entry-title">How To Create An NPM Repository Mirror</h1>
+
+                
+
+                <div class="td-module-meta-info">
+                    <div class="td-post-author-name"><div class="td-author-by">By</div> <a href="http://www.remotecto.net/author/rus/">rus</a><div class="td-author-line"> - </div> </div>                    <span class="td-post-date"><time class="entry-date updated td-module-date" datetime="2013-06-20T15:18:58+00:00" >June 20, 2013</time></span>                    <div class="td-post-comments"><a href="http://www.remotecto.net/2013/06/20/how-to-create-an-npm-repository-mirror/#comments"><i class="td-icon-comments"></i>17</a></div>                    <div class="td-post-views"><i class="td-icon-views"></i><span class="td-nr-views-642">6706</span></div>                </div>
+
+            </header>
+
+        </div>
+
+        <div class="td-post-sharing td-post-sharing-top ">
+				<div class="td-default-sharing">
+		            <a class="td-social-sharing-buttons td-social-facebook" href="http://www.facebook.com/sharer.php?u=http%3A%2F%2Fwww.remotecto.net%2F2013%2F06%2F20%2Fhow-to-create-an-npm-repository-mirror%2F" onclick="window.open(this.href, 'mywin','left=50,top=50,width=600,height=350,toolbar=0'); return false;"><i class="td-icon-facebook"></i><div class="td-social-but-text">Share on Facebook</div></a>
+		            <a class="td-social-sharing-buttons td-social-twitter" href="https://twitter.com/intent/tweet?text=How+To+Create+An+NPM+Repository+Mirror&url=http%3A%2F%2Fwww.remotecto.net%2F2013%2F06%2F20%2Fhow-to-create-an-npm-repository-mirror%2F&via=Remote+CTO"  ><i class="td-icon-twitter"></i><div class="td-social-but-text">Tweet on Twitter</div></a>
+		            <a class="td-social-sharing-buttons td-social-google" href="http://plus.google.com/share?url=http://www.remotecto.net/2013/06/20/how-to-create-an-npm-repository-mirror/" onclick="window.open(this.href, 'mywin','left=50,top=50,width=600,height=350,toolbar=0'); return false;"><i class="td-icon-googleplus"></i></a>
+		            <a class="td-social-sharing-buttons td-social-pinterest" href="http://pinterest.com/pin/create/button/?url=http://www.remotecto.net/2013/06/20/how-to-create-an-npm-repository-mirror/&amp;media=http://www.remotecto.net/wp-content/uploads/2013/06/npm.png&description=How+To+Create+An+NPM+Repository+Mirror" onclick="window.open(this.href, 'mywin','left=50,top=50,width=600,height=350,toolbar=0'); return false;"><i class="td-icon-pinterest"></i></a>
+		            <a class="td-social-sharing-buttons td-social-whatsapp" href="whatsapp://send?text=How+To+Create+An+NPM+Repository+Mirror%20-%20http%3A%2F%2Fwww.remotecto.net%2F2013%2F06%2F20%2Fhow-to-create-an-npm-repository-mirror%2F" ><i class="td-icon-whatsapp"></i></a>
+	            </div></div>
+
+        <div class="td-post-content">
+
+        
+        <p><img src="http://www.idimmu.net/wp-content/uploads/2013/06/npm-300x116.png" alt="npm" width="300" height="116" class="alignleft size-medium wp-image-643" srcset="http://www.remotecto.net/wp-content/uploads/2013/06/npm-300x116.png 300w, http://www.remotecto.net/wp-content/uploads/2013/06/npm.png 518w" sizes="(max-width: 300px) 100vw, 300px" />We use Node.js a LOT, which means we do npm install a LOT. And npm is pretty terrible, with horrible dependency handling so we can end up requesting hundreds of dependent modules with it&#8217;s recursive patten e.g. for just one of our projects we can end up with paths like</p>
+<p><code><br />
+./node_modules/bcrypt/node_modules/nodeunit/node_modules/should/node_modules/mocha/node_modules/glob/node_modules/minimatch/node_modules/sigmund/node_modules/tap/node_modules</p>
+<p>[root@hmon workspace]# find . -name node_modules | wc -l<br />
+2103<br />
+</code></p>
+<p>That&#8217;s 2103 node_modules directories, for an application we&#8217;ve written that has only 22 dependencies configured for it!</p>
+<p><code><br />
+[root@hmon workspace]# find . -name mocha | wc -l<br />
+59<br />
+</code></p>
+<p>There are 59 instances of the mocha module in the dependency chain, how is that for terrible reuse of code! Why can&#8217;t npm be nice like every other language out there, e.g. perl (hi cpan), PHP, Ruby (hi gems!) and Python??</p>
+<p>npm does cache locally, but it kind of sucks.</p>
+<p>Anyway, rant over, we want to create a mirror of the npm repository to mitigate periods of npm outages (occasionally it does have them) and hopefully speed things up a little bit, so here&#8217;s how I did it!</p>
+<h2>CouchDB</h2>
+<p>All the NPM data is stored in couchdb, I&#8217;m doing this on Centos so I&#8217;m going to use yum to install couchdb</p>
+<p><code><br />
+[root@hmon etc]# yum install couchdb<br />
+Loaded plugins: fastestmirror<br />
+Loading mirror speeds from cached hostfile<br />
+ * base: centos.mirror.linuxwerk.com<br />
+ * epel: mirrors.n-ix.net<br />
+ * extras: centos.mirror.linuxwerk.com<br />
+ * passenger: passenger.stealthymonkeys.com<br />
+ * rpmforge: mirror1.hs-esslingen.de<br />
+ * rpmforge-extras: mirror1.hs-esslingen.de<br />
+ * rpmforge-testing: mirror1.hs-esslingen.de<br />
+ * updates: mirror.optimate-server.de<br />
+Setting up Install Process<br />
+Resolving Dependencies<br />
+--> Running transaction check<br />
+---> Package couchdb.x86_64 0:1.2.1-1 will be installed<br />
+--> Finished Dependency Resolution</p>
+<p>Dependencies Resolved</p>
+<p>=================================================================================================================================================================================================================<br />
+ Package                                            Arch                                              Version                                              Repository                                       Size<br />
+=================================================================================================================================================================================================================<br />
+Installing:<br />
+ couchdb                                            x86_64                                            1.2.1-1                                              drum                                            1.1 M</p>
+<p>Transaction Summary<br />
+=================================================================================================================================================================================================================<br />
+Install       1 Package(s)</p>
+<p>Total download size: 1.1 M<br />
+Installed size: 3.0 M<br />
+Is this ok [y/N]: y<br />
+Downloading Packages:<br />
+couchdb-1.2.1-1.x86_64.rpm                                                                                                                                                                | 1.1 MB     00:00<br />
+Running rpm_check_debug<br />
+Running Transaction Test<br />
+Transaction Test Succeeded<br />
+Running Transaction<br />
+  Installing : couchdb-1.2.1-1.x86_64                                                                                                                                                                        1/1<br />
+  Verifying  : couchdb-1.2.1-1.x86_64                                                                                                                                                                        1/1 </p>
+<p>Installed:<br />
+  couchdb.x86_64 0:1.2.1-1                                                                                                                                                                                       </p>
+<p>Complete!<br />
+</code></p>
+<p>Simples! Next step is to start it, confirm it&#8217;s listening on a port and test it works!</p>
+<p><code><br />
+[root@hmon etc]# /etc/init.d/couchdb start<br />
+Starting database server couchdb<br />
+[root@hmon etc]# ps aux | grep couch<br />
+root      9790  0.0  0.0 106188  1532 pts/1    S    14:41   0:00 /bin/sh -e /opt/netdev/erlang/bin/couchdb -a /etc/couchdb/default.ini -a /etc/couchdb/local.ini -b -r 0 -p /var/run/couchdb/couchdb.pid -o couchdb.stdout -e couchdb.stderr -R<br />
+root      9800  0.0  0.0 106188   760 pts/1    S    14:41   0:00 /bin/sh -e /opt/netdev/erlang/bin/couchdb -a /etc/couchdb/default.ini -a /etc/couchdb/local.ini -b -r 0 -p /var/run/couchdb/couchdb.pid -o couchdb.stdout -e couchdb.stderr -R<br />
+root      9801  0.7  0.1 666732 18576 pts/1    Sl   14:41   0:00 /usr/lib64/erlang/erts-5.8.5/bin/beam.smp -Bd -K true -A 4 -- -root /usr/lib64/erlang -progname erl -- -home /root -- -noshell -noinput -os_mon start_memsup false start_cpu_sup false disk_space_check_interval 1 disk_almost_full_threshold 1 -sasl errlog_type error -couch_ini /etc/couchdb/default.ini /etc/couchdb/local.ini /etc/couchdb/default.ini /etc/couchdb/local.ini -s couch -pidfile /var/run/couchdb/couchdb.pid -heart<br />
+root      9834  0.0  0.0 103236   872 pts/1    S+   14:42   0:00 grep couch<br />
+root     26078  0.0  0.0 173292  1720 ?        S    May07   0:00 sudo -u drum setsid node /opt/netdev/drum-collab-provisioning/server/server-couch.js<br />
+drum     26079  0.0  0.4 999360 70064 ?        Ssl  May07  18:09 node /opt/netdev/drum-collab-provisioning/server/server-couch.js<br />
+[root@hmon etc]# netstat -lpn | grep 9801<br />
+tcp        0      0 127.0.0.1:5984              0.0.0.0:*                   LISTEN      9801/beam.smp<br />
+</code></p>
+<p>At the moment in it&#8217;s default configuration it&#8217;s only listening on 127.0.0.1 so we want to fix that!</p>
+<p>We also want to ensure that <a href="http://www.idimmu.net/2013/06/21/couchdb-errorinsecure_rewrite_rulereasontoo-many-segments/">secure_rewrites</a> is disabled else NPM will spit out loads of errors and not work!</p>
+<p>In <i>/etc/couchdb/local.ini</i> we can override the default configuration, so we want to change</p>
+<p><code><br />
+[httpd]<br />
+;port = 5984<br />
+;bind_address = 127.0.0.1<br />
+</code></p>
+<p>to</p>
+<p><code><br />
+[httpd]<br />
+;port = 5984<br />
+bind_address = 0.0.0.0<br />
+secure_rewrites = false<br />
+</code></p>
+<p>and then restart couchdb with <i>/etc/init.d/couchdb restart</i>! Now we can see couchdb listening on all ports and test it with curl</p>
+<p><code><br />
+[root@hmon couchdb]# netstat -lpn | grep 5984<br />
+tcp        0      0 0.0.0.0:5984                0.0.0.0:*                   LISTEN      10011/beam.smp<br />
+[root@hmon couchdb]# curl http://localhost:5984<br />
+{"couchdb":"Welcome","version":"1.2.1"}<br />
+</code></p>
+<p>Yay, we&#8217;re alive!!!</p>
+<h2>Setting Up CouchDB Replication</h2>
+<p>Now we need to tell couchdb that it needs to replicate from the NPM master in a continuous fashion, so as the NPM master updates, so does our couchdb instance!</p>
+<p><code><br />
+[root@hmon couchdb]# curl -X POST http://127.0.0.1:5984/_replicate -d '{"source":"http://isaacs.iriscouch.com/registry/", "target":"registry", "continuous":true, "create_target":true}' -H "Content-Type: application/json"<br />
+{"ok":true,"_local_id":"d0818878c462afa6791440ab08348394+continuous+create_target"}<br />
+</code></p>
+<p>And we&#8217;re off! You can interrogate how the replcation is doing by visiting the server with a webbrowser at <i>http://hostname:5984/_utils/</i> it should look a little like this:</p>
+<p><img src="http://www.idimmu.net/wp-content/uploads/2013/06/couchdb-npm-mirror.png" alt="couchdb-npm-mirror" width="557" height="286" class="alignleft size-full wp-image-645" srcset="http://www.remotecto.net/wp-content/uploads/2013/06/couchdb-npm-mirror.png 557w, http://www.remotecto.net/wp-content/uploads/2013/06/couchdb-npm-mirror-300x154.png 300w" sizes="(max-width: 557px) 100vw, 557px" /></p>
+<p>Eventually it will stop growing, I promise 😉 As of writing it&#8217;s just shy of 50GB</p>
+<p><img src="http://www.idimmu.net/wp-content/uploads/2013/06/couchdb-npm-mirror-2.png" alt="NPM Repository Mirror" width="557" height="27" class="aligncenter size-full wp-image-657" srcset="http://www.remotecto.net/wp-content/uploads/2013/06/couchdb-npm-mirror-2.png 557w, http://www.remotecto.net/wp-content/uploads/2013/06/couchdb-npm-mirror-2-300x14.png 300w" sizes="(max-width: 557px) 100vw, 557px" /></p>
+<h2>Configuring NPM To Use Your Mirror</h2>
+<p>First we need to install some <a href="https://github.com/isaacs/npmjs.org">random npmjs stuff</a> in to our couch database</p>
+<p><code><br />
+git clone git://github.com/isaacs/npmjs.org.git<br />
+cd npmjs.org<br />
+sudo npm install -g couchapp<br />
+npm install couchapp<br />
+npm install semver<br />
+couchapp push registry/app.js http://localhost:5984/registry<br />
+couchapp push www/app.js http://localhost:5984/registry<br />
+</code></p>
+<p>Which looks a little bit like this</p>
+<p><code><br />
+[root@hmon ~]# git clone git://github.com/isaacs/npmjs.org.git<br />
+Initialized empty Git repository in /root/npmjs.org/.git/<br />
+remote: Counting objects: 1291, done.<br />
+remote: Compressing objects: 100% (742/742), done.<br />
+remote: Total 1291 (delta 609), reused 1200 (delta 531)<br />
+Receiving objects: 100% (1291/1291), 649.70 KiB | 353 KiB/s, done.<br />
+Resolving deltas: 100% (609/609), done.<br />
+[root@hmon ~]# cd npmjs.org<br />
+[root@hmon npmjs.org]# npm install -g couchapp<br />
+npm http GET https://registry.npmjs.org/couchapp<br />
+npm http 304 https://registry.npmjs.org/couchapp<br />
+npm http GET https://registry.npmjs.org/watch<br />
+npm http GET https://registry.npmjs.org/request<br />
+npm http 304 https://registry.npmjs.org/request<br />
+npm http 304 https://registry.npmjs.org/watch<br />
+npm http GET https://registry.npmjs.org/qs<br />
+npm http GET https://registry.npmjs.org/json-stringify-safe<br />
+npm http GET https://registry.npmjs.org/forever-agent<br />
+npm http GET https://registry.npmjs.org/tunnel-agent<br />
+npm http GET https://registry.npmjs.org/http-signature<br />
+npm http GET https://registry.npmjs.org/hawk<br />
+npm http GET https://registry.npmjs.org/aws-sign<br />
+npm http GET https://registry.npmjs.org/oauth-sign<br />
+npm http GET https://registry.npmjs.org/cookie-jar<br />
+npm http GET https://registry.npmjs.org/node-uuid<br />
+npm http GET https://registry.npmjs.org/mime<br />
+npm http GET https://registry.npmjs.org/form-data/0.0.8<br />
+npm http 200 https://registry.npmjs.org/json-stringify-safe<br />
+npm http GET https://registry.npmjs.org/json-stringify-safe/-/json-stringify-safe-4.0.0.tgz<br />
+npm http 200 https://registry.npmjs.org/forever-agent<br />
+npm http GET https://registry.npmjs.org/forever-agent/-/forever-agent-0.5.0.tgz<br />
+npm http 200 https://registry.npmjs.org/http-signature<br />
+npm http 200 https://registry.npmjs.org/tunnel-agent<br />
+npm http GET https://registry.npmjs.org/http-signature/-/http-signature-0.9.11.tgz<br />
+npm http GET https://registry.npmjs.org/tunnel-agent/-/tunnel-agent-0.3.0.tgz<br />
+npm http 200 https://registry.npmjs.org/qs<br />
+npm http GET https://registry.npmjs.org/qs/-/qs-0.6.5.tgz<br />
+npm http 200 https://registry.npmjs.org/aws-sign<br />
+npm http GET https://registry.npmjs.org/aws-sign/-/aws-sign-0.3.0.tgz<br />
+npm http 200 https://registry.npmjs.org/oauth-sign<br />
+npm http GET https://registry.npmjs.org/oauth-sign/-/oauth-sign-0.3.0.tgz<br />
+npm http 200 https://registry.npmjs.org/cookie-jar<br />
+npm http GET https://registry.npmjs.org/cookie-jar/-/cookie-jar-0.3.0.tgz<br />
+npm http 200 https://registry.npmjs.org/node-uuid<br />
+npm http GET https://registry.npmjs.org/node-uuid/-/node-uuid-1.4.0.tgz<br />
+npm http 200 https://registry.npmjs.org/json-stringify-safe/-/json-stringify-safe-4.0.0.tgz<br />
+npm http 200 https://registry.npmjs.org/forever-agent/-/forever-agent-0.5.0.tgz<br />
+npm http 200 https://registry.npmjs.org/mime<br />
+npm http GET https://registry.npmjs.org/mime/-/mime-1.2.9.tgz<br />
+npm http 200 https://registry.npmjs.org/form-data/0.0.8<br />
+npm http GET https://registry.npmjs.org/form-data/-/form-data-0.0.8.tgz<br />
+npm http 200 https://registry.npmjs.org/http-signature/-/http-signature-0.9.11.tgz<br />
+npm http 200 https://registry.npmjs.org/qs/-/qs-0.6.5.tgz<br />
+npm http 200 https://registry.npmjs.org/tunnel-agent/-/tunnel-agent-0.3.0.tgz<br />
+npm http 200 https://registry.npmjs.org/aws-sign/-/aws-sign-0.3.0.tgz<br />
+npm http 200 https://registry.npmjs.org/cookie-jar/-/cookie-jar-0.3.0.tgz<br />
+npm http 200 https://registry.npmjs.org/oauth-sign/-/oauth-sign-0.3.0.tgz<br />
+npm http 200 https://registry.npmjs.org/node-uuid/-/node-uuid-1.4.0.tgz<br />
+npm http 200 https://registry.npmjs.org/mime/-/mime-1.2.9.tgz<br />
+npm http 200 https://registry.npmjs.org/form-data/-/form-data-0.0.8.tgz<br />
+npm http 200 https://registry.npmjs.org/hawk<br />
+npm http GET https://registry.npmjs.org/hawk/-/hawk-0.13.1.tgz<br />
+npm http 200 https://registry.npmjs.org/hawk/-/hawk-0.13.1.tgz<br />
+npm http GET https://registry.npmjs.org/assert-plus/0.1.2<br />
+npm http GET https://registry.npmjs.org/asn1/0.1.11<br />
+npm http GET https://registry.npmjs.org/ctype/0.5.2<br />
+npm http GET https://registry.npmjs.org/hoek<br />
+npm http GET https://registry.npmjs.org/boom<br />
+npm http GET https://registry.npmjs.org/cryptiles<br />
+npm http GET https://registry.npmjs.org/sntp<br />
+npm http GET https://registry.npmjs.org/combined-stream<br />
+npm http GET https://registry.npmjs.org/async<br />
+npm http 200 https://registry.npmjs.org/ctype/0.5.2<br />
+npm http 200 https://registry.npmjs.org/assert-plus/0.1.2<br />
+npm http 200 https://registry.npmjs.org/asn1/0.1.11<br />
+npm http 200 https://registry.npmjs.org/boom<br />
+npm http GET https://registry.npmjs.org/ctype/-/ctype-0.5.2.tgz<br />
+npm http GET https://registry.npmjs.org/boom/-/boom-0.4.2.tgz<br />
+npm http GET https://registry.npmjs.org/assert-plus/-/assert-plus-0.1.2.tgz<br />
+npm http GET https://registry.npmjs.org/asn1/-/asn1-0.1.11.tgz<br />
+npm http 200 https://registry.npmjs.org/cryptiles<br />
+npm http 200 https://registry.npmjs.org/combined-stream<br />
+npm http GET https://registry.npmjs.org/cryptiles/-/cryptiles-0.2.1.tgz<br />
+npm http GET https://registry.npmjs.org/combined-stream/-/combined-stream-0.0.4.tgz<br />
+npm http 200 https://registry.npmjs.org/sntp<br />
+npm http 200 https://registry.npmjs.org/ctype/-/ctype-0.5.2.tgz<br />
+npm http 200 https://registry.npmjs.org/boom/-/boom-0.4.2.tgz<br />
+npm http GET https://registry.npmjs.org/sntp/-/sntp-0.2.4.tgz<br />
+npm http 200 https://registry.npmjs.org/assert-plus/-/assert-plus-0.1.2.tgz<br />
+npm http 200 https://registry.npmjs.org/asn1/-/asn1-0.1.11.tgz<br />
+npm http 200 https://registry.npmjs.org/cryptiles/-/cryptiles-0.2.1.tgz<br />
+npm http 200 https://registry.npmjs.org/combined-stream/-/combined-stream-0.0.4.tgz<br />
+npm http 200 https://registry.npmjs.org/sntp/-/sntp-0.2.4.tgz<br />
+npm http 200 https://registry.npmjs.org/hoek<br />
+npm http GET https://registry.npmjs.org/hoek/-/hoek-0.8.5.tgz<br />
+npm http 200 https://registry.npmjs.org/async<br />
+npm http 200 https://registry.npmjs.org/hoek/-/hoek-0.8.5.tgz<br />
+npm http GET https://registry.npmjs.org/async/-/async-0.2.9.tgz<br />
+npm http GET https://registry.npmjs.org/hoek<br />
+npm http 200 https://registry.npmjs.org/async/-/async-0.2.9.tgz<br />
+npm http GET https://registry.npmjs.org/delayed-stream/0.0.5<br />
+npm http 304 https://registry.npmjs.org/hoek<br />
+npm http GET https://registry.npmjs.org/hoek/-/hoek-0.9.1.tgz<br />
+npm http 200 https://registry.npmjs.org/delayed-stream/0.0.5<br />
+npm http GET https://registry.npmjs.org/delayed-stream/-/delayed-stream-0.0.5.tgz<br />
+npm http 200 https://registry.npmjs.org/hoek/-/hoek-0.9.1.tgz<br />
+npm http 200 https://registry.npmjs.org/delayed-stream/-/delayed-stream-0.0.5.tgz<br />
+/root/.nvm/v0.8.15/bin/couchapp -> /root/.nvm/v0.8.15/lib/node_modules/couchapp/bin.js<br />
+couchapp@0.9.1 /root/.nvm/v0.8.15/lib/node_modules/couchapp<br />
+├── watch@0.7.0<br />
+└── request@2.21.0 (json-stringify-safe@4.0.0, forever-agent@0.5.0, aws-sign@0.3.0, qs@0.6.5, tunnel-agent@0.3.0, oauth-sign@0.3.0, cookie-jar@0.3.0, node-uuid@1.4.0, mime@1.2.9, http-signature@0.9.11, hawk@0.13.1, form-data@0.0.8)<br />
+[root@hmon npmjs.org]# npm install couchapp<br />
+npm http GET https://registry.npmjs.org/couchapp<br />
+npm http 304 https://registry.npmjs.org/couchapp<br />
+npm http GET https://registry.npmjs.org/watch<br />
+npm http GET https://registry.npmjs.org/request<br />
+npm http 304 https://registry.npmjs.org/request<br />
+npm http 304 https://registry.npmjs.org/watch<br />
+npm http GET https://registry.npmjs.org/qs<br />
+npm http GET https://registry.npmjs.org/json-stringify-safe<br />
+npm http GET https://registry.npmjs.org/forever-agent<br />
+npm http GET https://registry.npmjs.org/tunnel-agent<br />
+npm http GET https://registry.npmjs.org/http-signature<br />
+npm http GET https://registry.npmjs.org/hawk<br />
+npm http GET https://registry.npmjs.org/aws-sign<br />
+npm http GET https://registry.npmjs.org/oauth-sign<br />
+npm http GET https://registry.npmjs.org/cookie-jar<br />
+npm http GET https://registry.npmjs.org/node-uuid<br />
+npm http GET https://registry.npmjs.org/mime<br />
+npm http GET https://registry.npmjs.org/form-data/0.0.8<br />
+npm http 304 https://registry.npmjs.org/json-stringify-safe<br />
+npm http 304 https://registry.npmjs.org/qs<br />
+npm http 304 https://registry.npmjs.org/forever-agent<br />
+npm http 304 https://registry.npmjs.org/tunnel-agent<br />
+npm http 304 https://registry.npmjs.org/http-signature<br />
+npm http 304 https://registry.npmjs.org/hawk<br />
+npm http 304 https://registry.npmjs.org/aws-sign<br />
+npm http 304 https://registry.npmjs.org/oauth-sign<br />
+npm http 304 https://registry.npmjs.org/cookie-jar<br />
+npm http 304 https://registry.npmjs.org/node-uuid<br />
+npm http 304 https://registry.npmjs.org/mime<br />
+npm http 304 https://registry.npmjs.org/form-data/0.0.8<br />
+npm http GET https://registry.npmjs.org/assert-plus/0.1.2<br />
+npm http GET https://registry.npmjs.org/asn1/0.1.11<br />
+npm http GET https://registry.npmjs.org/ctype/0.5.2<br />
+npm http GET https://registry.npmjs.org/boom<br />
+npm http GET https://registry.npmjs.org/cryptiles<br />
+npm http GET https://registry.npmjs.org/hoek<br />
+npm http GET https://registry.npmjs.org/sntp<br />
+npm http GET https://registry.npmjs.org/combined-stream<br />
+npm http GET https://registry.npmjs.org/async<br />
+npm http 304 https://registry.npmjs.org/ctype/0.5.2<br />
+npm http 304 https://registry.npmjs.org/asn1/0.1.11<br />
+npm http 304 https://registry.npmjs.org/assert-plus/0.1.2<br />
+npm http 304 https://registry.npmjs.org/boom<br />
+npm http 304 https://registry.npmjs.org/cryptiles<br />
+npm http 304 https://registry.npmjs.org/hoek<br />
+npm http 304 https://registry.npmjs.org/sntp<br />
+npm http 304 https://registry.npmjs.org/combined-stream<br />
+npm http 304 https://registry.npmjs.org/async<br />
+npm http GET https://registry.npmjs.org/hoek<br />
+npm http GET https://registry.npmjs.org/delayed-stream/0.0.5<br />
+npm http 304 https://registry.npmjs.org/hoek<br />
+npm http 304 https://registry.npmjs.org/delayed-stream/0.0.5<br />
+couchapp@0.9.1 node_modules/couchapp<br />
+├── watch@0.7.0<br />
+└── request@2.21.0 (json-stringify-safe@4.0.0, forever-agent@0.5.0, aws-sign@0.3.0, qs@0.6.5, tunnel-agent@0.3.0, oauth-sign@0.3.0, cookie-jar@0.3.0, node-uuid@1.4.0, mime@1.2.9, http-signature@0.9.11, hawk@0.13.1, form-data@0.0.8)<br />
+[root@hmon npmjs.org]# npm install semver<br />
+npm http GET https://registry.npmjs.org/semver<br />
+npm http 200 https://registry.npmjs.org/semver<br />
+npm http GET https://registry.npmjs.org/semver/-/semver-1.0.14.tgz<br />
+npm http 200 https://registry.npmjs.org/semver/-/semver-1.0.14.tgz<br />
+semver@1.0.14 node_modules/semver<br />
+[root@hmon npmjs.org]# couchapp push registry/app.js http://localhost:5984/registry<br />
+Preparing.<br />
+Serializing.<br />
+PUT http://localhost:5984/registry/_design/scratch<br />
+Finished push. 1-8b4b7cde241179296b34d437d6fcbec3<br />
+[root@hmon npmjs.org]# couchapp push www/app.js http://localhost:5984/registry<br />
+Preparing.<br />
+Serializing.<br />
+PUT http://localhost:5984/registry/_design/ui<br />
+Finished push. 1-7d950267677c7a20ec944e4c8385af2f<br />
+</code></p>
+<p>Ok, now we should in theory have a completly working mirror repository of npm now!</p>
+<h2>Testing Your NPM Repository Mirror</h2>
+<p>Testing the npm repo mirror is easy enough, first we&#8217;ll make a request to the official repo then compare it to our server!</p>
+<p><code><br />
+[root@hmon npmjs.org]# npm search cakes<br />
+NAME         DESCRIPTION                                                   AUTHOR   DATE              KEYWORDS<br />
+mocha-cakes  bdd stories add-on for mocha test framework with cucumber given/then/when syntax. =quangv 2012-06-03 15:30  mocha bdd stories cucumber test testing gherkin acceptance customer functional end-user<br />
+npm http GET https://registry.npmjs.org/-/all/since?stale=update_after&startkey=1371737099041<br />
+npm http 200 https://registry.npmjs.org/-/all/since?stale=update_after&startkey=1371737099041<br />
+</code></p>
+<p>Ok the official mirror has something called mocha-cakes in it, sounds delicious!</p>
+<p><code><br />
+[root@hmon couchdb]# npm search cakes<br />
+npm http GET http://localhost:5984/registry/_design/app/_rewrite/-/all/since?stale=update_after&startkey=1371802019107<br />
+npm http 200 http://localhost:5984/registry/_design/app/_rewrite/-/all/since?stale=update_after&startkey=1371802019107<br />
+NAME         DESCRIPTION                                                   AUTHOR   DATE              KEYWORDS<br />
+mocha-cakes  bdd stories add-on for mocha test framework with cucumber given/then/when syntax. =quangv 2012-06-03 15:30  mocha bdd stories cucumber test testing gherkin acceptance customer functional end-user<br />
+</code></p>
+<p>And so does ours!!! It&#8217;s still syncing so I&#8217;m going to forgive that 404</p>
+<h2>Telling NPM To Use Our NPM Repository Mirror</h2>
+<p>We can either configure ~/.npmrc with</p>
+<p><code><br />
+registry = http://localhost:5984/registry/_design/app/_rewrite<br />
+</code></p>
+<p>or set it on the command line with</p>
+<p><code><br />
+npm config set registry http://localhost:5984/registry/_design/app/_rewrite<br />
+</code></p>
+<p>Bamo, a dozen commands later and now you too have your own working npm repository 😀</p>
+        </div>
+
+
+        <footer>
+                        
+            <div class="td-post-source-tags">
+                                <ul class="td-tags td-post-small-box clearfix"><li><span>TAGS</span></li><li><a href="http://www.remotecto.net/tag/mirror/">mirror</a></li><li><a href="http://www.remotecto.net/tag/nodejs/">nodejs</a></li><li><a href="http://www.remotecto.net/tag/npm/">npm</a></li><li><a href="http://www.remotecto.net/tag/repository/">repository</a></li></ul>            </div>
+
+            <div class="td-post-sharing td-post-sharing-bottom td-with-like"><span class="td-post-share-title">SHARE</span>
+            <div class="td-default-sharing">
+	            <a class="td-social-sharing-buttons td-social-facebook" href="http://www.facebook.com/sharer.php?u=http%3A%2F%2Fwww.remotecto.net%2F2013%2F06%2F20%2Fhow-to-create-an-npm-repository-mirror%2F" onclick="window.open(this.href, 'mywin','left=50,top=50,width=600,height=350,toolbar=0'); return false;"><i class="td-icon-facebook"></i><div class="td-social-but-text">Facebook</div></a>
+	            <a class="td-social-sharing-buttons td-social-twitter" href="https://twitter.com/intent/tweet?text=How+To+Create+An+NPM+Repository+Mirror&url=http%3A%2F%2Fwww.remotecto.net%2F2013%2F06%2F20%2Fhow-to-create-an-npm-repository-mirror%2F&via=Remote+CTO"><i class="td-icon-twitter"></i><div class="td-social-but-text">Twitter</div></a>
+	            <a class="td-social-sharing-buttons td-social-google" href="http://plus.google.com/share?url=http://www.remotecto.net/2013/06/20/how-to-create-an-npm-repository-mirror/" onclick="window.open(this.href, 'mywin','left=50,top=50,width=600,height=350,toolbar=0'); return false;"><i class="td-icon-googleplus"></i></a>
+	            <a class="td-social-sharing-buttons td-social-pinterest" href="http://pinterest.com/pin/create/button/?url=http://www.remotecto.net/2013/06/20/how-to-create-an-npm-repository-mirror/&amp;media=http://www.remotecto.net/wp-content/uploads/2013/06/npm.png&description=How+To+Create+An+NPM+Repository+Mirror" onclick="window.open(this.href, 'mywin','left=50,top=50,width=600,height=350,toolbar=0'); return false;"><i class="td-icon-pinterest"></i></a>
+	            <a class="td-social-sharing-buttons td-social-whatsapp" href="whatsapp://send?text=How+To+Create+An+NPM+Repository+Mirror%20-%20http%3A%2F%2Fwww.remotecto.net%2F2013%2F06%2F20%2Fhow-to-create-an-npm-repository-mirror%2F" ><i class="td-icon-whatsapp"></i></a>
+            </div><div class="td-classic-sharing"><ul><li class="td-classic-facebook"><iframe frameBorder="0" src="http://www.facebook.com/plugins/like.php?href=http://www.remotecto.net/2013/06/20/how-to-create-an-npm-repository-mirror/&amp;layout=button_count&amp;show_faces=false&amp;width=105&amp;action=like&amp;colorscheme=light&amp;height=21" style="border:none; overflow:hidden; width:105px; height:21px; background-color:transparent;"></iframe></li><li class="td-classic-twitter"><a href="https://twitter.com/share" class="twitter-share-button" data-url="http://www.remotecto.net/2013/06/20/how-to-create-an-npm-repository-mirror/" data-text="How To Create An NPM Repository Mirror" data-via="" data-lang="en">tweet</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script></li></ul></div></div>            <div class="td-block-row td-post-next-prev"><div class="td-block-span6 td-post-prev-post"><div class="td-post-next-prev-content"><span>Previous article</span><a href="http://www.remotecto.net/2013/06/19/volusion-review/">Volusion Review</a></div></div><div class="td-next-prev-separator"></div><div class="td-block-span6 td-post-next-post"><div class="td-post-next-prev-content"><span>Next article</span><a href="http://www.remotecto.net/2013/06/20/niche-site-duel-2-participation/">Niche Site Duel 2 Participation</a></div></div></div>            <div class="author-box-wrap"><a href="http://www.remotecto.net/author/rus/"><img alt='' src='http://1.gravatar.com/avatar/aa94de38dacd211a23557cb39dc503ad?s=96&#038;d=mm&#038;r=g' srcset='http://1.gravatar.com/avatar/aa94de38dacd211a23557cb39dc503ad?s=192&amp;d=mm&amp;r=g 2x' class='avatar avatar-96 photo' height='96' width='96' /></a><div class="desc"><div class="td-author-name vcard author"><span class="fn"><a href="http://www.remotecto.net/author/rus/">rus</a></span></div><div class="td-author-url"><a href="http://www.idimmu.net">http://www.idimmu.net</a></div><div class="td-author-description">Hi, I'm Rus and after 10 years of Linux administration and software development, in September 2014 I quit my day job, sold all my stuff and moved to Thailand to live the good life.
+
+My new website, <a href="http://www.ruspow.com">http://www.ruspow.com</a> shows how I'm making money online as well as what life can be like when you're not sat behind a desk and are free to make your own decisions!</div><div class="td-author-social"></div><div class="clearfix"></div></div></div>	        <span style="display: none;" itemprop="author" itemscope itemtype="https://schema.org/Person"><meta itemprop="name" content="rus"></span><meta itemprop="datePublished" content="2013-06-20T15:18:58+00:00"><meta itemprop="dateModified" content="2013-06-21T08:53:36+00:00"><meta itemscope itemprop="mainEntityOfPage" itemType="https://schema.org/WebPage" itemid="http://www.remotecto.net/2013/06/20/how-to-create-an-npm-repository-mirror/"/><span style="display: none;" itemprop="publisher" itemscope itemtype="https://schema.org/Organization"><span style="display: none;" itemprop="logo" itemscope itemtype="https://schema.org/ImageObject"><meta itemprop="url" content="http://www.remotecto.net/wp-content/uploads/2017/02/remotecto.png"></span><meta itemprop="name" content="Remote CTO"></span><meta itemprop="headline " content="How To Create An NPM Repository Mirror"><span style="display: none;" itemprop="image" itemscope itemtype="https://schema.org/ImageObject"><meta itemprop="url" content="http://www.remotecto.net/wp-content/uploads/2013/06/npm.png"><meta itemprop="width" content="518"><meta itemprop="height" content="202"></span>        </footer>
+
+    </article> <!-- /.post -->
+
+    <div class="td_block_wrap td_block_related_posts td_uid_2_5ad3ef091a483_rand td_with_ajax_pagination td-pb-border-top"  data-td-block-uid="td_uid_2_5ad3ef091a483" ><script>var block_td_uid_2_5ad3ef091a483 = new tdBlock();
+block_td_uid_2_5ad3ef091a483.id = "td_uid_2_5ad3ef091a483";
+block_td_uid_2_5ad3ef091a483.atts = '{"limit":3,"sort":"","post_ids":"","tag_slug":"","autors_id":"","installed_post_types":"","category_id":"","category_ids":"","custom_title":"","custom_url":"","show_child_cat":"","sub_cat_ajax":"","ajax_pagination":"next_prev","header_color":"","header_text_color":"","ajax_pagination_infinite_stop":"","td_column_number":3,"td_ajax_preloading":"","td_ajax_filter_type":"td_custom_related","td_ajax_filter_ids":"","td_filter_default_txt":"All","color_preset":"","border_top":"","class":"td_uid_2_5ad3ef091a483_rand","offset":"","css":"","live_filter":"cur_post_same_categories","live_filter_cur_post_id":642,"live_filter_cur_post_author":"1"}';
+block_td_uid_2_5ad3ef091a483.td_column_number = "3";
+block_td_uid_2_5ad3ef091a483.block_type = "td_block_related_posts";
+block_td_uid_2_5ad3ef091a483.post_count = "2";
+block_td_uid_2_5ad3ef091a483.found_posts = "2";
+block_td_uid_2_5ad3ef091a483.header_color = "";
+block_td_uid_2_5ad3ef091a483.ajax_pagination_infinite_stop = "";
+block_td_uid_2_5ad3ef091a483.max_num_pages = "1";
+tdBlocksArray.push(block_td_uid_2_5ad3ef091a483);
+</script><h4 class="td-related-title"><a id="td_uid_3_5ad3ef091b04a" class="td-related-left td-cur-simple-item" data-td_filter_value="" data-td_block_id="td_uid_2_5ad3ef091a483" href="#">RELATED ARTICLES</a><a id="td_uid_4_5ad3ef091b081" class="td-related-right" data-td_filter_value="td_related_more_from_author" data-td_block_id="td_uid_2_5ad3ef091a483" href="#">MORE FROM AUTHOR</a></h4><div id=td_uid_2_5ad3ef091a483 class="td_block_inner">
+
+	<div class="td-related-row">
+
+	<div class="td-related-span4">
+
+        <div class="td_module_related_posts td-animation-stack td_mod_related_posts">
+            <div class="td-module-image">
+                <div class="td-module-thumb"><a href="http://www.remotecto.net/2013/10/06/take-control-another-computer/" rel="bookmark" title="How To Take Control Of Another Computer"><img width="200" height="150" class="entry-thumb" src="http://www.remotecto.net/wp-content/uploads/2013/10/how-to-take-control-of-another-computer.jpg" alt="how to take control of another computer" title="How To Take Control Of Another Computer"/></a></div>                            </div>
+            <div class="item-details">
+                <h3 class="entry-title td-module-title"><a href="http://www.remotecto.net/2013/10/06/take-control-another-computer/" rel="bookmark" title="How To Take Control Of Another Computer">How To Take Control Of Another Computer</a></h3>            </div>
+        </div>
+        
+	</div> <!-- ./td-related-span4 -->
+
+	<div class="td-related-span4">
+
+        <div class="td_module_related_posts td-animation-stack td_mod_related_posts">
+            <div class="td-module-image">
+                <div class="td-module-thumb"><a href="http://www.remotecto.net/2013/09/27/sudo-sorry-must-tty-run-sudo/" rel="bookmark" title="sudo: sorry, you must have a tty to run sudo"><img width="113" height="150" class="entry-thumb" src="http://www.remotecto.net/wp-content/uploads/2013/09/sudo-sorry-you-must-have-a-tty-to-run-sudo.jpg" alt="sudo: sorry, you must have a tty to run sudo" title="sudo: sorry, you must have a tty to run sudo"/></a></div>                            </div>
+            <div class="item-details">
+                <h3 class="entry-title td-module-title"><a href="http://www.remotecto.net/2013/09/27/sudo-sorry-must-tty-run-sudo/" rel="bookmark" title="sudo: sorry, you must have a tty to run sudo">sudo: sorry, you must have a tty to run sudo</a></h3>            </div>
+        </div>
+        
+	</div> <!-- ./td-related-span4 --></div><!--./row-fluid--></div><div class="td-next-prev-wrap"><a href="#" class="td-ajax-prev-page ajax-page-disabled" id="prev-page-td_uid_2_5ad3ef091a483" data-td_block_id="td_uid_2_5ad3ef091a483"><i class="td-icon-font td-icon-menu-left"></i></a><a href="#"  class="td-ajax-next-page ajax-page-disabled" id="next-page-td_uid_2_5ad3ef091a483" data-td_block_id="td_uid_2_5ad3ef091a483"><i class="td-icon-font td-icon-menu-right"></i></a></div></div> <!-- ./block -->
+
+<div id="disqus_thread">
+            <div id="dsq-content">
+
+
+            <ul id="dsq-comments">
+                    <li class="comment even thread-even depth-1" id="dsq-comment-38304">
+        <div id="dsq-comment-header-38304" class="dsq-comment-header">
+            <cite id="dsq-cite-38304">
+                <span id="dsq-author-user-38304">noam</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-38304" class="dsq-comment-body">
+            <div id="dsq-comment-message-38304" class="dsq-comment-message"><p>how much disk space does your mirror require?</p>
+</div>
+        </div>
+
+    <ul class="children">
+    <li class="comment byuser comment-author-rus bypostauthor odd alt depth-2" id="dsq-comment-41323">
+        <div id="dsq-comment-header-41323" class="dsq-comment-header">
+            <cite id="dsq-cite-41323">
+                <a id="dsq-author-user-41323" href="http://www.idimmu.net" target="_blank" rel="nofollow">rus</a>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-41323" class="dsq-comment-body">
+            <div id="dsq-comment-message-41323" class="dsq-comment-message"><p>Hey noam, it looks like we&#8217;re using around 92GB for the entire thing</p>
+</div>
+        </div>
+
+    <ul class="children">
+    <li class="comment even depth-3" id="dsq-comment-47734">
+        <div id="dsq-comment-header-47734" class="dsq-comment-header">
+            <cite id="dsq-cite-47734">
+                <a id="dsq-author-user-47734" href="http://muratcorlu.com" target="_blank" rel="nofollow">Murat Çorlu</a>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-47734" class="dsq-comment-body">
+            <div id="dsq-comment-message-47734" class="dsq-comment-message"><p>Is it possible to store only your project&#8217;s dependencies on your mirror? And handle all updates manually?</p>
+</div>
+        </div>
+
+    <ul class="children">
+    <li class="comment odd alt depth-4" id="dsq-comment-57375">
+        <div id="dsq-comment-header-57375" class="dsq-comment-header">
+            <cite id="dsq-cite-57375">
+                <span id="dsq-author-user-57375">alex</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-57375" class="dsq-comment-body">
+            <div id="dsq-comment-message-57375" class="dsq-comment-message"><p>Yes, it is possible to have only your project’s dependencies, take look at Sinopia server. </p>
+<p>It can be called a cache, or a private registry, but it can&#8217;t be called a mirror. By definition, mirror is when you copy the entire database. </p>
+<p>And when you really need it (like npmjs.eu does), that&#8217;s when CouchDB is used.</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+    <li class="comment even depth-3" id="dsq-comment-52088">
+        <div id="dsq-comment-header-52088" class="dsq-comment-header">
+            <cite id="dsq-cite-52088">
+                <span id="dsq-author-user-52088">fergus</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-52088" class="dsq-comment-body">
+            <div id="dsq-comment-message-52088" class="dsq-comment-message"><p>Im up to nearly 200GB (and counting?) for the whole thing. There only seem to be about 51000 docs though. 200GB seems like a lot of storage for 51000 npm docs. Any tips? Does this seem wrong?</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+    <li class="comment odd alt thread-odd thread-alt depth-1" id="dsq-comment-38936">
+        <div id="dsq-comment-header-38936" class="dsq-comment-header">
+            <cite id="dsq-cite-38936">
+                <span id="dsq-author-user-38936">brian</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-38936" class="dsq-comment-body">
+            <div id="dsq-comment-message-38936" class="dsq-comment-message"><p>Hi, thanks for posting this. I&#8217;ve gone through the steps but I got an error when enter this command:</p>
+<p>couchapp push registry/app.js        <a href="http://localhost:5984/registry" rel="nofollow">http://localhost:5984/registry</a></p>
+<p>Error: connect ECONNREFUSED<br />
+    at errnoException (net.js:901:11)<br />
+    at Object.afterConnect [as oncomplete] (net.js:892:19)</p>
+<p>Can you tell how I can get past this? Thanks.</p>
+</div>
+        </div>
+
+    <ul class="children">
+    <li class="comment byuser comment-author-rus bypostauthor even depth-2" id="dsq-comment-41324">
+        <div id="dsq-comment-header-41324" class="dsq-comment-header">
+            <cite id="dsq-cite-41324">
+                <a id="dsq-author-user-41324" href="http://www.idimmu.net" target="_blank" rel="nofollow">rus</a>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-41324" class="dsq-comment-body">
+            <div id="dsq-comment-message-41324" class="dsq-comment-message"><p>is your couchdb instance up and listening on localhost:5984 ? What happens if you do</p>
+<p>telnet localhost 5984 ?</p>
+<p>does localhost correctly resolve to 127.0.0.1 ?</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+    <li class="comment odd alt thread-even depth-1" id="dsq-comment-39749">
+        <div id="dsq-comment-header-39749" class="dsq-comment-header">
+            <cite id="dsq-cite-39749">
+                <span id="dsq-author-user-39749">James</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-39749" class="dsq-comment-body">
+            <div id="dsq-comment-message-39749" class="dsq-comment-message"><p>I used some of the information on your post along with other details from another blog and the couchdb website to get my private mirror going. I&#8217;m still having issues with it getting completely updated. I used your &#8220;continuous: true&#8221; statement in the curl command and no updates are getting synced from the public repo. I&#8217;ve had to use &#8216;replicate <a href="http://isaacs.iriscouch.com/registry" rel="nofollow">http://isaacs.iriscouch.com/registry</a> <a href="http://user:pass@localhost:5984/registry" rel="nofollow">http://user:pass@localhost:5984/registry</a>&#8216; ran manually to get new updates.</p>
+</div>
+        </div>
+
+    <ul class="children">
+    <li class="comment byuser comment-author-rus bypostauthor even depth-2" id="dsq-comment-41325">
+        <div id="dsq-comment-header-41325" class="dsq-comment-header">
+            <cite id="dsq-cite-41325">
+                <a id="dsq-author-user-41325" href="http://www.idimmu.net" target="_blank" rel="nofollow">rus</a>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-41325" class="dsq-comment-body">
+            <div id="dsq-comment-message-41325" class="dsq-comment-message"><p>try creating a new document in _replicator like this : (i imagine wordpress is about to completely dick with the formating ..</p>
+<p>{<br />
+   &#8220;_id&#8221;: &#8220;registry-from-iriscouch&#8221;,<br />
+   &#8220;source&#8221;: &#8220;http://isaacs.iriscouch.com/registry/&#8221;,<br />
+   &#8220;target&#8221;: &#8220;registry&#8221;,<br />
+   &#8220;continuous&#8221;: true,<br />
+   &#8220;create_target&#8221;: true,<br />
+   &#8220;user_ctx&#8221;: {<br />
+       &#8220;name&#8221;: &#8220;admin&#8221;,<br />
+       &#8220;roles&#8221;: [<br />
+           &#8220;_admin&#8221;<br />
+       ]<br />
+   },<br />
+   &#8220;owner&#8221;: null<br />
+}</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+    <li class="comment odd alt thread-odd thread-alt depth-1" id="dsq-comment-43698">
+        <div id="dsq-comment-header-43698" class="dsq-comment-header">
+            <cite id="dsq-cite-43698">
+                <span id="dsq-author-user-43698">Do</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-43698" class="dsq-comment-body">
+            <div id="dsq-comment-message-43698" class="dsq-comment-message"><p>How can I update the local repository from the public repository?</p>
+</div>
+        </div>
+
+    <ul class="children">
+    <li class="comment byuser comment-author-rus bypostauthor even depth-2" id="dsq-comment-45798">
+        <div id="dsq-comment-header-45798" class="dsq-comment-header">
+            <cite id="dsq-cite-45798">
+                <a id="dsq-author-user-45798" href="http://www.idimmu.net" target="_blank" rel="nofollow">rus</a>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-45798" class="dsq-comment-body">
+            <div id="dsq-comment-message-45798" class="dsq-comment-message"><p>add the json pasted above your comment and ensure continuous is set to true</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+    <li class="comment odd alt thread-even depth-1" id="dsq-comment-70433">
+        <div id="dsq-comment-header-70433" class="dsq-comment-header">
+            <cite id="dsq-cite-70433">
+                <span id="dsq-author-user-70433">Gil Shinar</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-70433" class="dsq-comment-body">
+            <div id="dsq-comment-message-70433" class="dsq-comment-message"><p>Hi,</p>
+<p>I&#8217;m basically using CentOS but the procedure is exactly the same. At first I have tried it with couch 1.0.2 but then I found that it is too old. I have installed 1.6 from source and started replicating yesterday. Today I found it with 80.2GB so it seemed to be quiet full.</p>
+<p>When I run npm install  I get a very long error message that starts like:</p>
+<p>0 info it worked if it ends with ok</p>
+<p>1 verbose cli [ &#8216;/usr/local/bin/node&#8217;, &#8216;/usr/local/bin/npm&#8217;, &#8216;search&#8217;, &#8216;cakes&#8217; ]</p>
+<p>2 info using <a href="mailto:npm@1.4.21">npm@1.4.21</a></p>
+<p>3 info using <a href="mailto:node@v0.10.30">node@v0.10.30</a></p>
+<p>4 verbose request where is /registry/_design/app/_rewrite/-/all</p>
+<p>5 verbose request registry <a href="http://localhost:5984/" rel="nofollow">http://localhost:5984/</a></p>
+<p>6 verbose request id c8b97e2adb64803a</p>
+<p>7 verbose url raw /registry/_design/app/_rewrite/-/all</p>
+<p>8 verbose url resolving [ &#8216;http://localhost:5984/&#8217;,</p>
+<p>8 verbose url resolving &#8216;./registry/_design/app/_rewrite/-/all&#8217; ]</p>
+<p>9 verbose url resolved <a href="http://localhost:5984/registry/_design/app/_rewrite/-/all" rel="nofollow">http://localhost:5984/registry/_design/app/_rewrite/-/all</a></p>
+<p>10 verbose request where is <a href="http://localhost:5984/registry/_design/app/_rewrite/-/all" rel="nofollow">http://localhost:5984/registry/_design/app/_rewrite/-/all</a></p>
+<p>11 info trying registry request attempt 1 at 12:11:05</p>
+<p>12 http GET <a href="http://localhost:5984/registry/_design/app/_rewrite/-/all" rel="nofollow">http://localhost:5984/registry/_design/app/_rewrite/-/all</a></p>
+<p>13 http 500 <a href="http://localhost:5984/registry/_design/app/_rewrite/-/all" rel="nofollow">http://localhost:5984/registry/_design/app/_rewrite/-/all</a></p>
+<p>14 info retry will retry, error on last attempt: Error: {{badarg,[{erlang,port_command,</p>
+<p>14 info retry [#Port,</p>
+<p>After the above error, starts a very long npm error message that I prefer not to paste here.<br />
+Can someone please assist?</p>
+<p>Thanks<br />
+Gil</p>
+</div>
+        </div>
+
+    <ul class="children">
+    <li class="comment even depth-2" id="dsq-comment-70434">
+        <div id="dsq-comment-header-70434" class="dsq-comment-header">
+            <cite id="dsq-cite-70434">
+                <a id="dsq-author-user-70434" href="http://www.idimmu.net/" target="_blank" rel="nofollow">idimmu</a>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-70434" class="dsq-comment-body">
+            <div id="dsq-comment-message-70434" class="dsq-comment-message"><p>Hi Gil,</p>
+<p>Unless you really need a complete clone of the NPM repository, I recommend using <a href="https://github.com/rlidwka/sinopia" rel="nofollow">https://github.com/rlidwka/sinopia</a> instead. It&#8217;s what I&#8217;ve since moved to since writing this document up. It&#8217;s a lot easier to set up, simpler to manage and doesn&#8217;t require syncing the entire NPM repository. Sinopia acts as a caching proxy that you can also push your own NPM packages to it&#8217;s a lot better!</p>
+</div>
+        </div>
+
+    <ul class="children">
+    <li class="comment odd alt depth-3" id="dsq-comment-70435">
+        <div id="dsq-comment-header-70435" class="dsq-comment-header">
+            <cite id="dsq-cite-70435">
+                <span id="dsq-author-user-70435">Gil Shinar</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-70435" class="dsq-comment-body">
+            <div id="dsq-comment-message-70435" class="dsq-comment-message"><p>Hi,</p>
+<p>Have seen this before but still wanted to go on the complete clone.<br />
+If I want be able to make it work, I&#8217;ll move to sinopia</p>
+<p>Thanks<br />
+Gil</p>
+</div>
+        </div>
+
+    <ul class="children">
+    <li class="comment even depth-4" id="dsq-comment-70436">
+        <div id="dsq-comment-header-70436" class="dsq-comment-header">
+            <cite id="dsq-cite-70436">
+                <a id="dsq-author-user-70436" href="http://www.idimmu.net/" target="_blank" rel="nofollow">idimmu</a>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-70436" class="dsq-comment-body">
+            <div id="dsq-comment-message-70436" class="dsq-comment-message"><p>13 http 500 <a href="http://localhost:5984/registry/_design/app/_rewrite/-/all" rel="nofollow">http://localhost:5984/registry/_design/app/_rewrite/-/all</a><br />
+This looks like CouchDB is throwing an internal error, is there anything in your CouchDB logs that could relate to it and shed more information on the problem?</p>
+</div>
+        </div>
+
+    <ul class="children">
+    <li class="comment odd alt depth-5" id="dsq-comment-70437">
+        <div id="dsq-comment-header-70437" class="dsq-comment-header">
+            <cite id="dsq-cite-70437">
+                <span id="dsq-author-user-70437">Gil Shinar</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-70437" class="dsq-comment-body">
+            <div id="dsq-comment-message-70437" class="dsq-comment-message"><p>Hi,</p>
+<p>Good point. Looked at the DB log and found a very general error message with exit code 127.<br />
+Looked at a different ubuntu tutorial and found that I need version 1.4.0 but this doesn&#8217;t work at all. CouchDB fails to start properly with a strange error. BTW, how do I delete data from the DB? When I have reinstalled 1.6.0, I saw that I still have 82GB of data in the in the registry DB.<br />
+In your above tutorial, yum installs version 1.2.0 and when I install using yum I get only 1.0.2 so I have tried to install 1.2.0 from source but it fails to compile 🙁<br />
+What I&#8217;m trying to do now is to add all yum repos as you have and reinstall using yum. If I&#8217;ll get the 1.2.0, I&#8217;ll pray that it&#8217;ll start working properly. If not, I&#8217;ll have to move to sinopia although it is not the best solution for me.</p>
+<p>Thanks<br />
+Gil</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+    <li class="comment even depth-5" id="dsq-comment-70438">
+        <div id="dsq-comment-header-70438" class="dsq-comment-header">
+            <cite id="dsq-cite-70438">
+                <span id="dsq-author-user-70438">Gil Shinar</span>
+            </cite>
+        </div>
+        <div id="dsq-comment-body-70438" class="dsq-comment-body">
+            <div id="dsq-comment-message-70438" class="dsq-comment-message"><p>Couldn&#8217;t make it work 🙁<br />
+No matter which repo I have added, couldn&#8217;t find apache-couchdb higher tan 1.0.4</p>
+</div>
+        </div>
+
+    </li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+</ul><!-- .children -->
+</li><!-- #comment-## -->
+            </ul>
+
+
+        </div>
+
+    </div>
+
+<script type="text/javascript">
+var disqus_url = 'http://www.remotecto.net/2013/06/20/how-to-create-an-npm-repository-mirror/';
+var disqus_identifier = '642 http://www.idimmu.net/?p=642';
+var disqus_container_id = 'disqus_thread';
+var disqus_shortname = 'idimmu';
+var disqus_title = "How To Create An NPM Repository Mirror";
+var disqus_config_custom = window.disqus_config;
+var disqus_config = function () {
+    /*
+    All currently supported events:
+    onReady: fires when everything is ready,
+    onNewComment: fires when a new comment is posted,
+    onIdentify: fires when user is authenticated
+    */
+    
+    
+    this.language = '';
+        this.callbacks.onReady.push(function () {
+
+        // sync comments in the background so we don't block the page
+        var script = document.createElement('script');
+        script.async = true;
+        script.src = '?cf_action=sync_comments&post_id=642';
+
+        var firstScript = document.getElementsByTagName('script')[0];
+        firstScript.parentNode.insertBefore(script, firstScript);
+    });
+    
+    if (disqus_config_custom) {
+        disqus_config_custom.call(this);
+    }
+};
+
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+</script>
+
+                            </div>
+                        </div>
+                        <div class="td-pb-span4 td-main-sidebar" role="complementary">
+                            <div class="td-ss-main-sidebar">
+                                <aside class="widget widget_text">			<div class="textwidget"><script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- Remote CTO -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:300px;height:250px"
+     data-ad-client="ca-pub-7589418822682758"
+     data-ad-slot="1628607721"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script></div>
+		</aside><div class="td_block_wrap td_block_instagram td_block_widget td_uid_5_5ad3ef091d276_rand td-pb-border-top"  data-td-block-uid="td_uid_5_5ad3ef091d276" ><h4 class="block-title"><span>Instagram</span></h4><div id=td_uid_5_5ad3ef091d276 class="td-instagram-wrap td_block_inner td-column-1"><!-- td instagram source: instagram_cache -->        <!-- header section -->
+                    <div class="td-instagram-header">
+                <div class="td-instagram-profile-image"><img src="https://scontent-frx5-1.cdninstagram.com/vp/e134d959cd2b6deefb0f6e41e289b989/5B2A858C/t51.2885-19/s150x150/11254144_581714098634697_1336009512_a.jpg"/></div>
+                <div class="td-instagram-meta">
+                    <div class="td-instagram-user"><a href="https://www.instagram.com/ruspow" target="_blank">@ruspow</a></div>
+                    <div class="td-instagram-followers"><span>2,030</span> Followers</div>
+                    <a class="td-instagram-button" href="https://www.instagram.com/ruspow" target="_blank">Follow</a>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+            
+        <!-- user shared images -->
+                    <div class="td-instagram-main td-images-on-row-3 td-image-gap-2">
+                                        <div class="td-instagram-element">
+                            <!-- image -->
+                            <a href="https://www.instagram.com/p/BgAWGbTBWLn" target="_blank">
+                                <img class="td-instagram-image" src="https://scontent-frx5-1.cdninstagram.com/vp/f023321baf26e6707ccb92c615936f5a/5B35754F/t51.2885-15/s640x640/sh0.08/e35/28159114_2013675505514377_2034560389328404480_n.jpg"/>
+                            </a>
+                            <!-- video icon -->
+                                                    </div>
+                                            <!-- number of images to display -->
+                                            <div class="td-instagram-element">
+                            <!-- image -->
+                            <a href="https://www.instagram.com/p/BfmYmsZBaSj" target="_blank">
+                                <img class="td-instagram-image" src="https://scontent-frx5-1.cdninstagram.com/vp/fb7584a09964f4e9e6df1a10cf20f5ac/5B4C8D88/t51.2885-15/s640x640/sh0.08/e35/27890601_1011570188995093_3065543434484842496_n.jpg"/>
+                            </a>
+                            <!-- video icon -->
+                                                    </div>
+                                            <!-- number of images to display -->
+                                            <div class="td-instagram-element">
+                            <!-- image -->
+                            <a href="https://www.instagram.com/p/BfhOtEcBWmY" target="_blank">
+                                <img class="td-instagram-image" src="https://scontent-frx5-1.cdninstagram.com/vp/b2ee159f5202d01d49abf7e96e65e4de/5B31D604/t51.2885-15/s640x640/sh0.08/e35/27880356_1572340736181357_6610956658644353024_n.jpg"/>
+                            </a>
+                            <!-- video icon -->
+                                                    </div>
+                                            <!-- number of images to display -->
+                                            <div class="td-instagram-element">
+                            <!-- image -->
+                            <a href="https://www.instagram.com/p/BdpsdHSB4AX" target="_blank">
+                                <img class="td-instagram-image" src="https://scontent-frx5-1.cdninstagram.com/vp/bb8573a812db5cbe7a7920a8eb02fbd5/5B3D3C39/t51.2885-15/s640x640/sh0.08/e35/26066427_321567355012924_290200516305092608_n.jpg"/>
+                            </a>
+                            <!-- video icon -->
+                                                    </div>
+                                            <!-- number of images to display -->
+                                            <div class="td-instagram-element">
+                            <!-- image -->
+                            <a href="https://www.instagram.com/p/Bc2AjyEDUaH" target="_blank">
+                                <img class="td-instagram-image" src="https://scontent-frx5-1.cdninstagram.com/vp/b55dbb2eeb692782c68c69bc476645e2/5B4A92F5/t51.2885-15/s640x640/sh0.08/e35/25012280_337312540076504_7867149668336009216_n.jpg"/>
+                            </a>
+                            <!-- video icon -->
+                                                    </div>
+                                            <!-- number of images to display -->
+                                            <div class="td-instagram-element">
+                            <!-- image -->
+                            <a href="https://www.instagram.com/p/Bczn79-De2f" target="_blank">
+                                <img class="td-instagram-image" src="https://scontent-frx5-1.cdninstagram.com/vp/abdaa85dd07e05bd961b221621ab11b8/5B327FC0/t51.2885-15/s640x640/sh0.08/e35/25008453_150738635571046_3102232518301057024_n.jpg"/>
+                            </a>
+                            <!-- video icon -->
+                                                    </div>
+                                            <!-- number of images to display -->
+                                            <div class="td-instagram-element">
+                            <!-- image -->
+                            <a href="https://www.instagram.com/p/BcTyymwDNmi" target="_blank">
+                                <img class="td-instagram-image" src="https://scontent-frx5-1.cdninstagram.com/vp/5e66542b4958631e44856e0b40a9e323/5B4D708A/t51.2885-15/s640x640/sh0.08/e35/24177777_145550462676836_6830217350445268992_n.jpg"/>
+                            </a>
+                            <!-- video icon -->
+                                                    </div>
+                                            <!-- number of images to display -->
+                                            <div class="td-instagram-element">
+                            <!-- image -->
+                            <a href="https://www.instagram.com/p/BcR6mp5ju9i" target="_blank">
+                                <img class="td-instagram-image" src="https://scontent-frx5-1.cdninstagram.com/vp/5c40d240f27565ad273a44447d346fe2/5B324875/t51.2885-15/s640x640/sh0.08/e35/24327338_1305975492839798_3469322844809199616_n.jpg"/>
+                            </a>
+                            <!-- video icon -->
+                                                    </div>
+                                            <!-- number of images to display -->
+                                            <div class="td-instagram-element">
+                            <!-- image -->
+                            <a href="https://www.instagram.com/p/BcRNP6qD9sY" target="_blank">
+                                <img class="td-instagram-image" src="https://scontent-frx5-1.cdninstagram.com/vp/6f8adac9d1fa19faf70cabbc514a7199/5B3CE85C/t51.2885-15/s640x640/sh0.08/e35/24177950_131877380806430_2932122689206222848_n.jpg"/>
+                            </a>
+                            <!-- video icon -->
+                                                    </div>
+                                            <!-- number of images to display -->
+                                            <div class="td-instagram-element">
+                            <!-- image -->
+                            <a href="https://www.instagram.com/p/BcRBpYlD-iV" target="_blank">
+                                <img class="td-instagram-image" src="https://scontent-frx5-1.cdninstagram.com/vp/5ad3678bce2458e200e0fdda877ff0d0/5B3DE107/t51.2885-15/s640x640/sh0.08/e35/24331618_334188287059555_5320834137458737152_n.jpg"/>
+                            </a>
+                            <!-- video icon -->
+                                                    </div>
+                                            <!-- number of images to display -->
+                                            <div class="td-instagram-element">
+                            <!-- image -->
+                            <a href="https://www.instagram.com/p/BcQsmdJDMG6" target="_blank">
+                                <img class="td-instagram-image" src="https://scontent-frx5-1.cdninstagram.com/vp/90efeaca65ef79f6ac37edd4de0c4ad4/5B34B4E5/t51.2885-15/s640x640/sh0.08/e35/24274153_1235289759947834_1860665551584493568_n.jpg"/>
+                            </a>
+                            <!-- video icon -->
+                                                    </div>
+                                            <!-- number of images to display -->
+                                            <div class="td-instagram-element">
+                            <!-- image -->
+                            <a href="https://www.instagram.com/p/BcPrL8MDSop" target="_blank">
+                                <img class="td-instagram-image" src="https://scontent-frx5-1.cdninstagram.com/vp/a1717af2048dbc4c9af9bee7e79d97b4/5B2FE51C/t51.2885-15/s640x640/sh0.08/e35/24177387_2029770353965524_4045972799011946496_n.jpg"/>
+                            </a>
+                            <!-- video icon -->
+                                                    </div>
+                                            <!-- number of images to display -->
+                                    <div class="clearfix"></div>
+            </div>
+            </div></div> <!-- ./block --><aside class="widget widget_text">			<div class="textwidget"><script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- Remote CTO -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:300px;height:250px"
+     data-ad-client="ca-pub-7589418822682758"
+     data-ad-slot="1628607721"></ins>
+<script>
+(adsbygoogle = window.adsbygoogle || []).push({});
+</script></div>
+		</aside><aside class="widget widget_categories"><div class="block-title"><span>Categories</span></div>		<ul>
+	<li class="cat-item cat-item-117"><a href="http://www.remotecto.net/category/systems/android/" >Android</a>
+</li>
+	<li class="cat-item cat-item-12"><a href="http://www.remotecto.net/category/systems/apple/" >Apple</a>
+</li>
+	<li class="cat-item cat-item-115"><a href="http://www.remotecto.net/category/burger-reviews/" >Burger Reviews</a>
+</li>
+	<li class="cat-item cat-item-128"><a href="http://www.remotecto.net/category/misc/crossfit/" >CrossFit</a>
+</li>
+	<li class="cat-item cat-item-16"><a href="http://www.remotecto.net/category/systems/dell/" >Dell</a>
+</li>
+	<li class="cat-item cat-item-6"><a href="http://www.remotecto.net/category/misc/food/" >Food</a>
+</li>
+	<li class="cat-item cat-item-14"><a href="http://www.remotecto.net/category/programming/grails/" >Grails</a>
+</li>
+	<li class="cat-item cat-item-107"><a href="http://www.remotecto.net/category/misc/income-reports/" >Income Reports</a>
+</li>
+	<li class="cat-item cat-item-9"><a href="http://www.remotecto.net/category/systems/java/" >Java</a>
+</li>
+	<li class="cat-item cat-item-7"><a href="http://www.remotecto.net/category/misc/life/" >Life</a>
+</li>
+	<li class="cat-item cat-item-4"><a href="http://www.remotecto.net/category/systems/linux/" >Linux</a>
+</li>
+	<li class="cat-item cat-item-125"><a href="http://www.remotecto.net/category/systems/microsoft/" >Microsoft</a>
+</li>
+	<li class="cat-item cat-item-1"><a href="http://www.remotecto.net/category/misc/" >Misc</a>
+</li>
+	<li class="cat-item cat-item-137"><a href="http://www.remotecto.net/category/programming/node-js/" >Node.JS</a>
+</li>
+	<li class="cat-item cat-item-3"><a href="http://www.remotecto.net/category/programming/php/" >PHP</a>
+</li>
+	<li class="cat-item cat-item-116"><a href="http://www.remotecto.net/category/programming/" >Programming</a>
+</li>
+	<li class="cat-item cat-item-10"><a href="http://www.remotecto.net/category/systems/redhat/" >Redhat</a>
+</li>
+	<li class="cat-item cat-item-5"><a href="http://www.remotecto.net/category/misc/reviews/" >Reviews</a>
+</li>
+	<li class="cat-item cat-item-120"><a href="http://www.remotecto.net/category/systems/security/" >Security</a>
+</li>
+	<li class="cat-item cat-item-141"><a href="http://www.remotecto.net/category/seo/" >SEO</a>
+</li>
+	<li class="cat-item cat-item-114"><a href="http://www.remotecto.net/category/systems/" >Systems</a>
+</li>
+	<li class="cat-item cat-item-11"><a href="http://www.remotecto.net/category/systems/ubuntu/" >Ubuntu</a>
+</li>
+	<li class="cat-item cat-item-8"><a href="http://www.remotecto.net/category/systems/windows/" >Windows</a>
+</li>
+	<li class="cat-item cat-item-83"><a href="http://www.remotecto.net/category/systems/wordpress-2/" >Wordpress</a>
+</li>
+		</ul>
+</aside><aside class="widget widget_text">			<div class="textwidget"><a href="http://stackexchange.com/users/60890">
+<img src="http://stackexchange.com/users/flair/60890.png?theme=clean" width="208" height="58" alt="profile for idimmu on Stack Exchange, a network of free, community-driven Q&amp;A sites" title="profile for idimmu on Stack Exchange, a network of free, community-driven Q&amp;A sites">
+</a></div>
+		</aside>                            </div>
+                        </div>
+                            </div> <!-- /.td-pb-row -->
+    </div> <!-- /.td-container -->
+</div> <!-- /.td-main-content-wrap -->
+
+
+<!-- Instagram -->
+
+
+
+<!-- Footer -->
+<div class="td-footer-wrapper">
+    <div class="td-container">
+
+	    <div class="td-pb-row">
+		    <div class="td-pb-span12">
+			    		    </div>
+	    </div>
+
+        <div class="td-pb-row">
+
+            <div class="td-pb-span4">
+                <div class="td_block_wrap td_block_7 td_uid_7_5ad3ef091e672_rand td-pb-border-top"  data-td-block-uid="td_uid_7_5ad3ef091e672" ><script>var block_td_uid_7_5ad3ef091e672 = new tdBlock();
+block_td_uid_7_5ad3ef091e672.id = "td_uid_7_5ad3ef091e672";
+block_td_uid_7_5ad3ef091e672.atts = '{"limit":3,"sort":"featured","post_ids":"","tag_slug":"","autors_id":"","installed_post_types":"","category_id":"","category_ids":"","custom_title":"EDITOR PICKS","custom_url":"","show_child_cat":"","sub_cat_ajax":"","ajax_pagination":"","header_color":"","header_text_color":"","ajax_pagination_infinite_stop":"","td_column_number":1,"td_ajax_preloading":"","td_ajax_filter_type":"","td_ajax_filter_ids":"","td_filter_default_txt":"All","color_preset":"","border_top":"","class":"td_uid_7_5ad3ef091e672_rand","offset":"","css":"","live_filter":"","live_filter_cur_post_id":"","live_filter_cur_post_author":""}';
+block_td_uid_7_5ad3ef091e672.td_column_number = "1";
+block_td_uid_7_5ad3ef091e672.block_type = "td_block_7";
+block_td_uid_7_5ad3ef091e672.post_count = "0";
+block_td_uid_7_5ad3ef091e672.found_posts = "0";
+block_td_uid_7_5ad3ef091e672.header_color = "";
+block_td_uid_7_5ad3ef091e672.ajax_pagination_infinite_stop = "";
+block_td_uid_7_5ad3ef091e672.max_num_pages = "0";
+tdBlocksArray.push(block_td_uid_7_5ad3ef091e672);
+</script><div class="td-block-title-wrap"><h4 class="block-title"><span>EDITOR PICKS</span></h4></div><div id=td_uid_7_5ad3ef091e672 class="td_block_inner"></div></div> <!-- ./block -->                            </div>
+
+            <div class="td-pb-span4">
+                <div class="td_block_wrap td_block_7 td_uid_8_5ad3ef091ea8b_rand td-pb-border-top"  data-td-block-uid="td_uid_8_5ad3ef091ea8b" ><script>var block_td_uid_8_5ad3ef091ea8b = new tdBlock();
+block_td_uid_8_5ad3ef091ea8b.id = "td_uid_8_5ad3ef091ea8b";
+block_td_uid_8_5ad3ef091ea8b.atts = '{"limit":3,"sort":"popular","post_ids":"","tag_slug":"","autors_id":"","installed_post_types":"","category_id":"","category_ids":"","custom_title":"POPULAR POSTS","custom_url":"","show_child_cat":"","sub_cat_ajax":"","ajax_pagination":"","header_color":"","header_text_color":"","ajax_pagination_infinite_stop":"","td_column_number":1,"td_ajax_preloading":"","td_ajax_filter_type":"","td_ajax_filter_ids":"","td_filter_default_txt":"All","color_preset":"","border_top":"","class":"td_uid_8_5ad3ef091ea8b_rand","offset":"","css":"","live_filter":"","live_filter_cur_post_id":"","live_filter_cur_post_author":""}';
+block_td_uid_8_5ad3ef091ea8b.td_column_number = "1";
+block_td_uid_8_5ad3ef091ea8b.block_type = "td_block_7";
+block_td_uid_8_5ad3ef091ea8b.post_count = "3";
+block_td_uid_8_5ad3ef091ea8b.found_posts = "104";
+block_td_uid_8_5ad3ef091ea8b.header_color = "";
+block_td_uid_8_5ad3ef091ea8b.ajax_pagination_infinite_stop = "";
+block_td_uid_8_5ad3ef091ea8b.max_num_pages = "35";
+tdBlocksArray.push(block_td_uid_8_5ad3ef091ea8b);
+</script><div class="td-block-title-wrap"><h4 class="block-title"><span>POPULAR POSTS</span></h4></div><div id=td_uid_8_5ad3ef091ea8b class="td_block_inner">
+
+	<div class="td-block-span12">
+
+        <div class="td_module_6 td_module_wrap td-animation-stack">
+
+        <div class="td-module-thumb"><a href="http://www.remotecto.net/2013/03/27/odd-occurrences-in-apache-access-logs/" rel="bookmark" title="Odd Occurrences In Apache Access Logs"><img width="70" height="70" class="entry-thumb" src="http://www.remotecto.net/wp-content/uploads/2013/03/apache_logo1.png" alt="Apache" title="Odd Occurrences In Apache Access Logs"/></a></div>
+        <div class="item-details">
+            <h3 class="entry-title td-module-title"><a href="http://www.remotecto.net/2013/03/27/odd-occurrences-in-apache-access-logs/" rel="bookmark" title="Odd Occurrences In Apache Access Logs">Odd Occurrences In Apache Access Logs</a></h3>            <div class="td-module-meta-info">
+                                                <span class="td-post-date"><time class="entry-date updated td-module-date" datetime="2013-03-27T23:33:21+00:00" >March 27, 2013</time></span>                            </div>
+        </div>
+
+        </div>
+
+        
+	</div> <!-- ./td-block-span12 -->
+
+	<div class="td-block-span12">
+
+        <div class="td_module_6 td_module_wrap td-animation-stack">
+
+        <div class="td-module-thumb"><a href="http://www.remotecto.net/2009/10/20/creating-a-local-and-http-redhat-yum-repository/" rel="bookmark" title="Creating A Local and HTTP RedHat Yum Repository"><img width="100" height="70" class="entry-thumb" src="http://www.remotecto.net/wp-content/themes/Newspaper/images/no-thumb/td_100x70.png" alt=""/></a></div>
+        <div class="item-details">
+            <h3 class="entry-title td-module-title"><a href="http://www.remotecto.net/2009/10/20/creating-a-local-and-http-redhat-yum-repository/" rel="bookmark" title="Creating A Local and HTTP RedHat Yum Repository">Creating A Local and HTTP RedHat Yum Repository</a></h3>            <div class="td-module-meta-info">
+                                                <span class="td-post-date"><time class="entry-date updated td-module-date" datetime="2009-10-20T22:05:41+00:00" >October 20, 2009</time></span>                            </div>
+        </div>
+
+        </div>
+
+        
+	</div> <!-- ./td-block-span12 -->
+
+	<div class="td-block-span12">
+
+        <div class="td_module_6 td_module_wrap td-animation-stack">
+
+        <div class="td-module-thumb"><a href="http://www.remotecto.net/2010/10/19/changing-a-drac-password-on-the-command-line-with-racadm/" rel="bookmark" title="Changing A DRAC Password On The Command Line With racadm"><img width="100" height="70" class="entry-thumb" src="http://www.remotecto.net/wp-content/themes/Newspaper/images/no-thumb/td_100x70.png" alt=""/></a></div>
+        <div class="item-details">
+            <h3 class="entry-title td-module-title"><a href="http://www.remotecto.net/2010/10/19/changing-a-drac-password-on-the-command-line-with-racadm/" rel="bookmark" title="Changing A DRAC Password On The Command Line With racadm">Changing A DRAC Password On The Command Line With racadm</a></h3>            <div class="td-module-meta-info">
+                                                <span class="td-post-date"><time class="entry-date updated td-module-date" datetime="2010-10-19T08:21:46+00:00" >October 19, 2010</time></span>                            </div>
+        </div>
+
+        </div>
+
+        
+	</div> <!-- ./td-block-span12 --></div></div> <!-- ./block -->                            </div>
+
+            <div class="td-pb-span4">
+                <div class="td_block_wrap td_block_popular_categories td_uid_9_5ad3ef091faf8_rand widget widget_categories td-pb-border-top"  data-td-block-uid="td_uid_9_5ad3ef091faf8" ><h4 class="block-title"><span>POPULAR CATEGORY</span></h4><ul class="td-pb-padding-side"><li><a href="http://www.remotecto.net/category/systems/linux/">Linux<span class="td-cat-no">49</span></a></li><li><a href="http://www.remotecto.net/category/systems/ubuntu/">Ubuntu<span class="td-cat-no">19</span></a></li><li><a href="http://www.remotecto.net/category/burger-reviews/">Burger Reviews<span class="td-cat-no">9</span></a></li><li><a href="http://www.remotecto.net/category/systems/java/">Java<span class="td-cat-no">7</span></a></li><li><a href="http://www.remotecto.net/category/systems/redhat/">Redhat<span class="td-cat-no">7</span></a></li><li><a href="http://www.remotecto.net/category/misc/life/">Life<span class="td-cat-no">6</span></a></li><li><a href="http://www.remotecto.net/category/systems/">Systems<span class="td-cat-no">5</span></a></li><li><a href="http://www.remotecto.net/category/programming/php/">PHP<span class="td-cat-no">4</span></a></li><li><a href="http://www.remotecto.net/category/systems/apple/">Apple<span class="td-cat-no">4</span></a></li></ul></div> <!-- ./block -->                            </div>
+        </div>
+    </div>
+    <div class="td-footer-bottom-full">
+        <div class="td-container">
+            <div class="td-pb-row">
+                <div class="td-pb-span3"><aside class="footer-logo-wrap"><a href="http://www.remotecto.net/"><img src="http://www.remotecto.net/wp-content/uploads/2017/02/remotecto.png" alt="Remote CTO" title="Remote CTO"/></a></aside></div><div class="td-pb-span5"><aside class="footer-text-wrap"><div class="block-title"><span>ABOUT US</span></div></aside></div><div class="td-pb-span4"><aside class="footer-social-wrap td-social-style-2"><div class="block-title"><span>FOLLOW US</span></div>
+        <span class="td-social-icon-wrap">
+            <a target="_blank" href="https://instagram.com/ruspow/" title="Instagram">
+                <i class="td-icon-font td-icon-instagram"></i>
+            </a>
+        </span>
+        <span class="td-social-icon-wrap">
+            <a target="_blank" href="http://www.last.fm/user/ruspow" title="Lastfm">
+                <i class="td-icon-font td-icon-lastfm"></i>
+            </a>
+        </span>
+        <span class="td-social-icon-wrap">
+            <a target="_blank" href="https://www.reddit.com/user/ruspow" title="Reddit">
+                <i class="td-icon-font td-icon-reddit"></i>
+            </a>
+        </span></aside></div>            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sub Footer -->
+    <div class="td-sub-footer-container">
+        <div class="td-container">
+            <div class="td-pb-row">
+                <div class="td-pb-span7 td-sub-footer-menu">
+                                        </div>
+
+                <div class="td-pb-span5 td-sub-footer-copy">
+                    &copy;                 </div>
+            </div>
+        </div>
+    </div>
+</div><!--close td-outer-wrap-->
+
+        <script type="text/javascript">
+        // <![CDATA[
+        var disqus_shortname = 'idimmu';
+        (function () {
+            var nodes = document.getElementsByTagName('span');
+            for (var i = 0, url; i < nodes.length; i++) {
+                if (nodes[i].className.indexOf('dsq-postid') != -1 && nodes[i].parentNode.tagName == 'A') {
+                    nodes[i].parentNode.setAttribute('data-disqus-identifier', nodes[i].getAttribute('data-dsqidentifier'));
+                    url = nodes[i].parentNode.href.split('#', 1);
+                    if (url.length == 1) { url = url[0]; }
+                    else { url = url[1]; }
+                    nodes[i].parentNode.href = url + '#disqus_thread';
+                }
+            }
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+        // ]]>
+        </script>
+        
+
+    <!--
+
+        Theme: Newspaper by tagDiv 2016
+        Version: 7.3 (rara)
+        Deploy mode: deploy
+        
+        uid: 5ad3ef092025f
+    -->
+
+    <script type='text/javascript' src='http://www.remotecto.net/wp-content/themes/Newspaper/js/tagdiv_theme.js?ver=7.3'></script>
+<script type='text/javascript' src='http://www.remotecto.net/wp-includes/js/comment-reply.min.js?ver=4.7.2'></script>
+<script type='text/javascript' src='http://www.remotecto.net/wp-includes/js/wp-embed.min.js?ver=4.7.2'></script>
+
+<!-- JS generated by theme -->
+
+<script>
+    
+
+	
+
+		(function(){
+			var html_jquery_obj = jQuery('html');
+
+			if (html_jquery_obj.length && (html_jquery_obj.is('.ie8') || html_jquery_obj.is('.ie9'))) {
+
+				var path = 'http://www.remotecto.net/wp-content/themes/idimmu-newspaper/style.css';
+
+				jQuery.get(path, function(data) {
+
+					var str_split_separator = '#td_css_split_separator';
+					var arr_splits = data.split(str_split_separator);
+					var arr_length = arr_splits.length;
+
+					if (arr_length > 1) {
+
+						var dir_path = 'http://www.remotecto.net/wp-content/themes/Newspaper';
+						var splited_css = '';
+
+						for (var i = 0; i < arr_length; i++) {
+							if (i > 0) {
+								arr_splits[i] = str_split_separator + ' ' + arr_splits[i];
+							}
+							//jQuery('head').append('<style>' + arr_splits[i] + '</style>');
+
+							var formated_str = arr_splits[i].replace(/\surl\(\'(?!data\:)/gi, function regex_function(str) {
+								return ' url(\'' + dir_path + '/' + str.replace(/url\(\'/gi, '').replace(/^\s+|\s+$/gm,'');
+							});
+
+							splited_css += "<style>" + formated_str + "</style>";
+						}
+
+						var td_theme_css = jQuery('link#td-theme-css');
+
+						if (td_theme_css.length) {
+							td_theme_css.after(splited_css);
+						}
+					}
+				});
+			}
+		})();
+
+	
+	
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,31 @@
+#!/bin/bash
+run() {
+	node_modules/registry-static/bin/registry-static -d 127.0.0.1 -o npm/registry&
+	pid=$!
+	pv -d "$pid" &
+}
+
+run
+
+while ps "$pid"
+do
+	fpos=
+	while true
+	do
+		fpos2="$(cat /proc/$pid/fdinfo/* | sha512sum)"
+		if [ "$fpos2" = "$fpos" ]
+		then
+			break
+		fi
+		fpos="$fpos2"
+		sleep $((60*2))
+	done
+	kill "$pid" || {
+		if ! ps $BGPID
+		then
+			find npm/registry -size 0 -delete #&
+			#BGPID=$!
+		fi
+	}
+	run
+done

@@ -1,0 +1,14 @@
+#!/usr/bin/debmirror --config-file
+$progress=1;
+$getcontents=1;
+$diff_mode="use";
+
+$mirrordir="debian-security";
+$host="security.debian.org";
+$remoteroot="debian-security";
+$download_method="http";
+@dists="stretch/updates,testing/updates";
+@arches="amd64";
+$keyring="trustedkeys.gpg";
+
+

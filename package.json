@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "github-mirror": "^0.1.5",
+    "registry-static": "^2.2.1"
+  }
+}

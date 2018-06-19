@@ -1,0 +1,6 @@
+#!/bin/bash
+
+repo=guardianproject.info/fdroid/repo
+wget --mirror https://${repo}/index.{jar,xml}
+
+sed -e 's!.*<apkname>\([^<]*\)</apkname>!'"https://${repo}/"'\1\n!g' ${repo}/index.xml | grep '\.apk$' | xargs wget --mirror

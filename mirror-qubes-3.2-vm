@@ -1,0 +1,14 @@
+#!/usr/bin/debmirror --config-file
+$progress=1;
+$getcontents=1;
+$diff_mode="use";
+
+$mirrordir="qubes-3.2-vm";
+$host="deb.qubes-os.org";
+$remoteroot="r3.2/vm";
+$download_method="https";
+@dists="stretch";
+@arches="amd64";
+$keyring="trustedkeys.gpg";
+
+

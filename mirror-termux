@@ -1,0 +1,15 @@
+#!/usr/bin/debmirror --config-file
+$progress=1;
+$getcontents=1;
+$diff_mode="use";
+
+$mirrordir="termux";
+$host="termux.net";
+$remoteroot="";
+$ignore_release_gpg=1;
+$download_method="http";
+@dists="stable";
+@arches="all,arm";
+$keyring="trustedkeys.gpg";
+
+

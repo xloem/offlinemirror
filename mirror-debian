@@ -1,0 +1,14 @@
+#!/usr/bin/debmirror --config-file
+$progress=1;
+$getcontents=1;
+$diff_mode="use";
+
+$mirrordir="debian";
+$host="mirrors.lug.mtu.edu";
+$remoteroot="debian";
+$download_method="https";
+@dists="stretch,stretch-updates,stretch-backports,testing,testing-updates";
+@arches="amd64,i386";
+$keyring="trustedkeys.gpg";
+
+

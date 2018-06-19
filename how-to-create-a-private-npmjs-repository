@@ -1,0 +1,248 @@
+<!DOCTYPE html><!--[if IE 7]><html lang="en" class="no-js lt-ie9 lt-ie8"><![endif]--><!--[if IE 8]><html lang="en" class="no-js lt-ie9"><![endif]--><!-- [if gt IE 8] <!--><html lang="en" class="no-js"><!-- <![endif]--><head><script src="//archive.org/includes/analytics.js?v=cf34f82" type="text/javascript"></script>
+<script type="text/javascript">window.addEventListener('DOMContentLoaded',function(){var v=archive_analytics.values;v.service='wb';v.server_name='wwwb-app19.us.archive.org';v.server_ms=250;archive_analytics.send_pageview({});});</script><script type="text/javascript" src="/static/js/wbhack.js?v=1522452177.0" charset="utf-8"></script>
+
+<script type="text/javascript">
+__wbhack.init('https://web.archive.org/web');
+</script>
+<link rel="stylesheet" type="text/css" href="/static/css/banner-styles.css?v=1522452177.0" />
+<link rel="stylesheet" type="text/css" href="/static/css/iconochive.css?v=1522452177.0" />
+
+<!-- End Wayback Rewrite JS Include --><meta charset="utf-8"><meta name="viewport" content="initial-scale=1.0, maximum-scale=2.0"><meta name="robots" content="noodp,noydir"><meta name="google-site-verification" content="PxsSB27c1htuGUegPRO-ubYA5uMmgcGcNk8Z6bpxD04"><meta name="msvalidate.01" content="3E4766653F966E638D10CC03AD1092A5"><meta name="author" content="Tom Gallacher"><meta name="description" content="npmjs.org never goes down, or so we thought."><meta name="keywords" content="Clock, Digital Agency, Web Design, node.js, digital strategy, online marketing, Award-winning"><meta property="og:type" content="article"><meta property="og:site_name" content="Clock"><meta property="og:title" content="How to create a private npm.js repository"><meta property="og:description" content="npmjs.org never goes down, or so we thought."><meta property="article:section" content="Blog"><meta property="og:url" content="https://web.archive.org/web/20140802161607/http://clock.co.uk/blog/how-to-create-a-private-npmjs-repository"><meta property="og:image" content="https://web.archive.org/web/20140802161607im_/http://darkroom.clock.co.uk/1000/7a569a93eefeeca52d09d2516cef2767:a2bbe13c6cfec493971657a4171f6fa7/5.jpg"><meta property="article:published_time" content="2012-11-20T12:56:00.000Z"><link href="https://plus.google.com/100412066008205838197?rel=publisher" rel="license"><meta name="twitter:card" content="summary"><meta name="twitter:site" content="@clock"><meta property="fb:admins" content="200154933429705"><title>How to create a private npm.js repository | Clock</title><!--if (gt IE 8) | (IEMobile)--><link rel="stylesheet" href="/web/20140802161607cs_/http://clock.co.uk/static/css/962c42956a615ea1062fc9d9413a13dc/index.css"><!--[if (lt IE 9) & (!IEMobile)]><link rel="stylesheet" href="/static/css/561eacc7b8162404b741a05fdfa68179/oldie.css"><![endif]--><script src="/web/20140802161607js_/http://clock.co.uk/static/js/lib/vendor/e714d68927f07505de51a83a9230b700/modernizr.min.js"></script><script src="/web/20140802161607js_/http://clock.co.uk/static/js/build/32afad3a9e197becc654be31c39f3894/head.js"></script><link rel="shortcut icon" href="/web/20140802161607im_/http://clock.co.uk/static/img/meta/1ee97c0cf86ecda78de03deaec98c620/favicon.ico"><meta name="apple-mobile-web-app-title" content="Ideas+Craft"><link rel="apple-touch-icon-precomposed" href="/web/20140802161607im_/http://clock.co.uk/static/img/meta/27153c10d9edb2475bac0fb0cd5dc5cd/apple-touch-icon-precomposed-57x57.png" sizes="57x57"><link rel="apple-touch-icon-precomposed" href="/web/20140802161607im_/http://clock.co.uk/static/img/meta/4473e092378c20460169245ecb657f37/apple-touch-icon-precomposed-114x114.png" sizes="114x114"><link rel="apple-touch-icon-precomposed" href="/web/20140802161607im_/http://clock.co.uk/static/img/meta/23ce010ff93073cdee9b20b90d8b556b/apple-touch-icon-precomposed-120x120.png" sizes="120x120"><link rel="apple-touch-icon-precomposed" href="/web/20140802161607im_/http://clock.co.uk/static/img/meta/47beacfbf3ee6d75574984b08f0acfc3/apple-touch-icon-precomposed-72x72.png" sizes="72x72"><link rel="apple-touch-icon-precomposed" href="/web/20140802161607im_/http://clock.co.uk/static/img/meta/5b5967b454c839e7a6f9638d14ed5cd0/apple-touch-icon-precomposed-76x76.png" sizes="76x76"><link rel="apple-touch-icon-precomposed" href="/web/20140802161607im_/http://clock.co.uk/static/img/meta/8a868392dacf1c311caad8ab90702d1e/apple-touch-icon-precomposed-144x144.png" sizes="144x144"><link rel="apple-touch-icon-precomposed" href="/web/20140802161607im_/http://clock.co.uk/static/img/meta/apple-touch-icon-precomposed-150x150.png" sizes="150x150"><meta name="application-name" content="Ideas+Craft"><meta name="msapplication-TileImage" content="/static/img/meta/63f9f228a32bb3234c9f596c5a7b6264/microsoft-pinned-tile-image-144x144.png"><meta name="msapplication-TileColor" content="#ffffff"></head><body class="page page--article"><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//web.archive.org/web/20140802161607/http://www.google-analytics.com/analytics.js','ga');
+  
+  ga('create', 'UA-708019-2', 'clock.co.uk')
+  ga('send', 'pageview')
+  </script><script>// Create the catfish object for a global namespace to hang off
+window.catfish = {
+  articleId: '532c32792f3fd8547fa3fdaa'
+}
+ga('send', 'event', 'articleView', 'view', window.catfish.articleId, { nonInteraction: true })</script><div id="wrap"><header id="header" role="banner" class="header"><div class="block"><h1 class="header__logo"><a href="/web/20140802161607/http://clock.co.uk/">Clock</a></h1><a href="#show-navigation" class="header__nav__show"><i class="icon icon--navigation icon--reversed">show navigation</i></a></div></header><nav id="nav" role="navigation" class="nav"><h2 class="nav__title">Site Navigation</h2><div class="block"><div class="nav__logo"><a href="/web/20140802161607/http://clock.co.uk/" tabindex="-1">Home</a></div><a href="#close-navigation" tabindex="-1" class="nav__hide"><i class="icon icon--close icon--reversed">hide navigation</i></a></div><ul class="nav__list"><li class="nav__item nav__item--about"><a href="/web/20140802161607/http://clock.co.uk/about" tabindex="-1" class="nav__link"><span>About</span></a></li><li class="nav__item nav__item--work"><a href="/web/20140802161607/http://clock.co.uk/work" tabindex="-1" class="nav__link"><span>Work</span></a></li><li class="nav__item nav__item--services"><a href="/web/20140802161607/http://clock.co.uk/services" tabindex="-1" class="nav__link"><span>Services</span></a></li><li class="nav__item nav__item--culture"><a href="/web/20140802161607/http://clock.co.uk/culture" tabindex="-1" class="nav__link"><span>Culture</span></a></li><li class="nav__item nav__item--blog"><a href="/web/20140802161607/http://clock.co.uk/blog" tabindex="-1" class="nav__link"><span>Blog</span></a></li><li class="nav__item nav__item--join"><a href="/web/20140802161607/http://clock.co.uk/join-us" tabindex="-1" class="nav__link"><span>Join Us</span></a></li><li class="nav__item nav__item--contact"><a href="/web/20140802161607/http://clock.co.uk/contact" tabindex="-1" class="nav__link"><span>Contact</span></a></li></ul></nav><main role="main" class="main"><div class="main__content"><div class="grid grid-main grid--gutterless"><div class="grid__item one-whole large-one-whole"><header class="article__header"><div style="background-image: url('https://web.archive.org/web/20140802161607im_/http://darkroom.clock.co.uk/1000/7a569a93eefeeca52d09d2516cef2767:a2bbe13c6cfec493971657a4171f6fa7/5.jpg');" class="article__image"></div><div class="block article__header__body"><h1 class="main__title--alt article__title"><span>How to create a private npm.js repository</span></h1><div class="media article__meta"><a href="/web/20140802161607/http://clock.co.uk/blog/author?id=532c32792f3fd8547fa3fda9"><img src="https://web.archive.org/web/20140802161607im_/http://darkroom.clock.co.uk/80/4af032eb485c1dbbf3efe746ccdb4bf8:76d581aaabdfbd5e360dd2eaa8a5779e/tomg.jpg" alt="Tom Gallacher" class="media__image article__avatar"/></a><div class="media__body"><p class="article__author">By <a href="/web/20140802161607/http://clock.co.uk/blog/author?id=532c32792f3fd8547fa3fda9">Tom Gallacher</a></p><p class="article__date"><time datetime="2012-11-20T12:56:00.000Z">20 November 2012</time></p></div></div></div></header><div class="article__body main__offset__wrap"><section class="article__main main__offset__item"><div class="block"><div class="prose article__prose"><h1>npmjs.org never goes down</h1>
+
+<p>Or so I thought. </p>
+
+<p>I was going to do some development on my local machine, so I fired up <code>npm install 
+&lt;packagename&gt;</code>. Unfortunately, due to a npmjs.org outage, it was not possible for me to get on with my work. So I did what any driven developer would do; I set up a CouchDB replica of npmjs.org. Next time this happens I will be prepared! </p>
+
+<p>As this npmjs.org replica is hosted in the same datacenter as we deploy most of our sites to, it enables a super speedy deployment to testing. </p>
+
+<p>How do we go about this you ask? Well let me tell you. </p>
+<h2>Installing CouchDB</h2>
+
+<p><b>Note</b>: These instruction are geared towards Ubuntu 12.04 LTS. But it should be pretty easy to get it up and running on *nix systems, including Mac OS X. </p>
+
+<p>Install the required packages: </p>
+
+
+<pre><code>sudo apt-get install build-essential autoconf automake libtool erlang libicu-dev libmozjs-dev libcurl4-openssl-dev </code></pre>
+
+<p>Download CouchDB 1.2: </p>
+
+
+<pre><code>wget http://mirrors.ukfast.co.uk/sites/ftp.apache.org/couchdb/releases/1.2.0/apache-couchdb-1.2.0.tar.gz </code></pre>
+
+<p>Extract, and relax: </p>
+
+
+<pre><code>tar xfv apache-couchdb-1.2.0.tar.gz </code></pre>
+
+<p>Now time to compile: </p>
+
+
+<pre><code>cd apache-couchdb-1.2.0
+./configure
+make
+make install 
+</code></pre>
+
+<p>After all that is done we now want to check that everything's fine and dandy, and that we get the expected output: </p>
+
+
+<pre><code>$ couchdb
+Apache CouchDB 1.2.0 (LogLevel=info) is starting.
+Apache CouchDB has started. Time to relax.
+[info] [&lt;0.32.0&gt;] Apache CouchDB has started on http://127.0.0.1:5984/ 
+</code></pre>
+
+<p>Sweet! But are we responding to requests? </p>
+
+
+<pre><code>$ curl -X GET http://localhost:5984
+ [info] [&lt;0.361.0&gt;] 127.0.0.1 - - GET / 200
+</code></pre>
+
+<p>Boom, we now have a working CouchDB instance! </p>
+
+<p><b>You</b>: But wait kind sir, what if we reboot the server? Wouldn't we have to start CouchDB again? </p>
+
+<p>That's correct, we will be adding CouchDB to our init.d scripts, but first we need to create the correct user, group and permissions: </p>
+
+
+<pre><code>$ sudo adduser --disabled-login --disabled-password --no-create-home couchdb
+Adding user `couchdb' ...
+Adding new group `couchdb' (1001) ...
+Adding new user `couchdb' (1001) with group `couchdb' ...
+Not creating home directory `/home/couchdb'.
+Changing the user information for couchdb Enter the new value, or press ENTER for the default
+  Full Name []: CouchDB Admin 
+  Room Number []: 
+  Work Phone []: 
+  Home Phone []: 
+  Other []: 
+Is the information correct? [Y/n] Y
+</code></pre>
+
+<p>User added, now permissions: </p>
+
+
+<pre><code>sudo chown -R couchdb:couchdb /usr/local/var/{log,lib,run}/couchdb
+sudo chown -R couchdb:couchdb /usr/local/etc/couchdb/local.ini
+</code></pre>
+
+<p>We also want CouchDB to use insecure rewrites for a later step. We can turn this off by editing <code>/usr/local/etc/couchdb/local.ini</code> and adding <code>secure_rewrites = false</code> on line 11 in the <code>httpd</code> section.
+
+<pre><code>$ sudo vim /usr/local/etc/couchdb/local.ini
+[httpd]
+secure_rewrites = false
+</code></pre></p>
+
+<p>Ready, set, link, defaults. </p>
+
+
+<pre><code>sudo ln -s /usr/local/etc/init.d/couchdb /etc/init.d
+sudo update-rc.d couchdb defaults 
+</code></pre>
+
+<p>Go! </p>
+
+
+<pre><code>sudo /etc/init.d/couchdb start </code></pre>
+
+<p>YAY! </p>
+<h2>Replicating npmjs.org</h2>
+
+<p>Now to replicate the npm registry. </p>
+
+
+<pre><code>curl -X POST http://127.0.0.1:5984/_replicate -d '{"source":"http://isaacs.iriscouch.com/registry/", "target":"registry", "create_target":true}' -H "Content-Type: application/json" </code></pre>
+
+<p>What this means is that once this is completed your local replication will be an exact copy of the npm registry. However, to ensure we do indeed receive all updates we will add a <code>"continuous":true</code> parameter to the JSON string in our POST request, this utilises CouchDB’s <code>_changes</code> API and will pull any new changes when this API is notified. </p>
+
+
+<pre><code>curl -X POST http://127.0.0.1:5984/_replicate -d '{"source":"http://isaacs.iriscouch.com/registry/", "target":"registry", "continuous":true, "create_target":true}' -H "Content-Type: application/json" </code></pre>
+
+<p>We are now replicating continuously from npmjs.org to our private CouchDB instance! If you ever want to stop these replications you can easily do this by running the same command as before but add a <code>"cancel":true</code> parameter to the JSON POST data. </p>
+
+
+<pre><code>curl -X POST http://127.0.0.1:5984/_replicate -d '{"source":"http://isaacs.iriscouch.com/registry/", "target":"registry", "continuous":true, "create_target":true, "cancel":true}' -H "Content-Type: application/json" </code></pre>
+
+<p>And we're almost done! All we need to do now is to set up our own version of the npmjs.org registry and we can relax like the humanoid in the CouchDB logo, or as we do @clock, melt into our beanbags... </p>
+<h2>Getting npm to work with our replicated CouchDB</h2>
+
+<p>Most of the steps can be found on isaacs github in the npmjs.org git repositories <a href="https://web.archive.org/web/20140802161607/https://github.com/isaacs/npmjs.org">README</a></p>
+
+<p>Of course we need to have <code>nodejs</code> and <code>git</code> installed for this: </p>
+
+
+<pre><code>git clone git://github.com/isaacs/npmjs.org.git
+cd npmjs.org
+sudo npm install -g couchapp 
+npm install couchapp 
+npm install semver 
+couchapp push registry/app.js http://localhost:5984/registry 
+couchapp push www/app.js http://localhost:5984/registry 
+</code></pre>
+
+<p>Boom, we now have a working npm repository, to test this we can run the following command. </p>
+
+
+<pre><code>npm --registry http://localhost:5984/registry/_design/scratch/_rewrite login
+npm --registry http://localhost:5984/registry/_design/scratch/_rewrite search
+</code></pre>
+
+<p>If you are getting results then everything has gone according to plan! </p>
+
+<p>So we now have your own privately hosted <code>npm</code> registry, that keeps itself updated. Pretty neat, eh? </p>
+
+<p>All you have to get up and running on your own subdomain is to modify the [vhosts] section in <code>/usr/local/etc/couchdb/local.ini</code>. Uncomment the example and restart CouchDB. </p>
+
+
+<pre><code>$ vim /usr/local/etc/couchdb/local.ini
+[vhosts]
+example.com = /registry/_design/scratch/_rewrite
+</code></pre>
+
+<p>And while we are at it will lock down the application and prevent unauthorised users from deleting our data. </p>
+
+
+<pre><code>$ vim /usr/local/etc/couchdb/local.ini
+[admins]
+admin = password
+$ sudo /etc/init.d/couchdb restart 
+</code></pre>
+<h1>Start using your version of npm with the client!</h1>
+
+<p>Straight from the npmjs.org <a href="https://web.archive.org/web/20140802161607/https://github.com/isaacs/npmjs.org">README</a>, just replace <code>&lt;registryurl&gt;</code> with your registries url, for example: </p>
+
+
+<pre><code>http://localhost:5984/registry/_design/app/_rewrite</code></pre>
+
+<p>You can point the npm client at the registry by putting this in your <code>~/.npmrc</code> file: </p>
+
+
+<pre><code>registry = &lt;registryurl&gt;</code></pre>
+
+<p>You can also set the npm registry config property like: </p>
+
+
+<pre><code>npm config set &lt;registryurl&gt;</code></pre>
+
+<p>Or you can simple override the registry config on each call: </p>
+
+
+<pre><code>npm --registry &lt;registryurl&gt; install &lt;packagename&gt;</code></pre>
+
+<p>Now you can code and install modules even if npmjs.org is down, or if you want to push the boat even further have this running on your local machine and have an up-to-date npm registry just before your flight. ;] </p>
+
+<p>Thanks to <a href="https://web.archive.org/web/20140802161607/https://twitter.com/MikeCronn">@MikeCronn</a> and <a href="https://web.archive.org/web/20140802161607/https://twitter.com/mjorhimself">@mjorhimself</a> for proof reading this article. </p>
+
+<p>Any questions? Tweet me <a href="https://web.archive.org/web/20140802161607/https://twitter.com/tomgco">@tomgco</a> or leave a comment below.</p><footer><div class="article__meta"><div class="article__author">By Tom Gallacher</div><div class="article__date"><time datetime="2012-11-20T12:56:00.000Z">20 November 2012</time></div></div><p class="p--small">Content on this blog is licensed under a <a href="https://web.archive.org/web/20140802161607/http://creativecommons.org/licenses/by/3.0/" target="_blank">Creative Commons Attribution 3.0 License</a>.</p></footer></div><div class="article__comments"><button class="button--circle--number article__comments__view js-comment-button"><span class="article__comments__view__inner js-kern">View<br/>Comments<br/><span class="article__comments__view__count"><a data-disqus-identifier="532c32792f3fd8547fa3fdaa" href="#">0</a></span></span></button><div class="comment-container js-comments"><div id="disqus_thread"></div><script>var disqus_shortname = 'clockblog'
+  , disqus_identifier = '532c32792f3fd8547fa3fdaa'
+  
+// Comment thread
+;(function() {
+  var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();
+
+// Comment count
+(function () {
+  var s = document.createElement('script'); s.async = true;
+  s.type = 'text/javascript';
+  s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+  (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+}());</script></div></div></div></section><section class="latest"><div class="block"><h2 class="related__title"><a href="/web/20140802161607/http://clock.co.uk/blog"><span>Related</span></a></h2><div class="latest__body"><ul class="gs latest__list"><li id="article-53c78e40a189e58e155ec9dc" class="gc"><div data-href="/blog/search/the-php-conference-amsterdam-part-2" class="overlay overlay--small latest__image"><img src="https://web.archive.org/web/20140802161607im_/http://darkroom.clock.co.uk/300/064c1b6268e96e7d7c393f30cb6db9b4:99264cf0c9b0a9a91777d99b11cd89c0/6.jpg"/><span class="overlay__text">Read</span></div><h3 class="latest__text"><a data-hover="#article-53c78e40a189e58e155ec9dc .latest__image" href="/web/20140802161607/http://clock.co.uk/blog/search/the-php-conference-amsterdam-part-2"><span> The PHP Conference Amsterdam — Part 2</span></a></h3></li><li id="article-53bd2d35a189e58e155ec9ce" class="gc"><div data-href="/blog/amsterdam-php-glow-sticks-and-gun-toting-cats-riding-unicorns" class="overlay overlay--small latest__image"><img src="https://web.archive.org/web/20140802161607im_/http://darkroom.clock.co.uk/300/8e32de2f05f5db58f14bce989680858d:0ec7b17f2d402395e75952c812c926c8/20140630-151655.JPG"/><span class="overlay__text">Read</span></div><h3 class="latest__text"><a data-hover="#article-53bd2d35a189e58e155ec9ce .latest__image" href="/web/20140802161607/http://clock.co.uk/blog/amsterdam-php-glow-sticks-and-gun-toting-cats-riding-unicorns"><span> The PHP Conference Amsterdam - Part 1</span></a></h3></li></ul></div></div></section><section class="hiring"><div class="block"><div class="hiring__photos"><div class="hiring__photo--1"><div style="background-image: url('/web/20140802161607im_/http://clock.co.uk/static/img/content/join-us/join-us-e.jpg');" class="hiring__photo"></div></div><div class="hiring__photo--2"><div style="background-image: url('/web/20140802161607im_/http://clock.co.uk/static/img/content/join-us/join-us-f.jpg');" class="hiring__photo"></div></div><div class="hiring__photo--3"><div style="background-image: url('/web/20140802161607im_/http://clock.co.uk/static/img/content/join-us/join-us-d.jpg');" class="hiring__photo"></div></div></div><div class="hiring__body"><h2 class="hiring__title js-kern">Join Us</h2><div class="prose"><h3>Come and work for Clock</h3><p>Clock is made up of bright, hard-working and talented people and we're always on the look out for more. You can browse the current jobs below or follow us <a href="https://web.archive.org/web/20140802161607/http://twitter.com/clock/" target="_blank">@clock</a> for the latest vacancies.</p></div><a href="/web/20140802161607/http://clock.co.uk/join-us" class="button--circle hiring__link"><span class="hiring__link__inner js-kern">View<br/>Jobs</span></a></div></div></section></div></div></div></div></main></div><footer id="footer" role="contentinfo" class="footer"><div class="footer__fixed"><div class="block"><h2 class="footer__title"><span>Ideas + Craft</span></h2><ul class="footer__social"><li><a target="_blank" href="https://web.archive.org/web/20140802161607/https://twitter.com/clock"><i class="icon icon--twitter icon--reversed icon--large">Twitter</i></a></li><li><a target="_blank" href="https://web.archive.org/web/20140802161607/https://www.facebook.com/clocklimited"><i class="icon icon--facebook icon--reversed icon--large">Facebook</i></a></li><li><a target="_blank" href="https://web.archive.org/web/20140802161607/http://instagram.com/clock_limited"><i class="icon icon--instagram icon--reversed icon--large">Instagram</i></a></li><li><a target="_blank" href="https://web.archive.org/web/20140802161607/https://github.com/clocklimited"><i class="icon icon--github icon--reversed icon--large">Github</i></a></li><li><a target="_blank" href="https://web.archive.org/web/20140802161607/http://uk.linkedin.com/company/clock-limited"><i class="icon icon--linkedin icon--reversed icon--large">LinkedIn</i></a></li></ul><div class="prose prose--reversed footer__copyright"><p><span>Copyright © 2014 Clock Limited. </span><span>Clock ® is a Registered Trademark of Clock Limited in the European Community 
+and other territories.</span></p><p><a href="/web/20140802161607/http://clock.co.uk/legal">Important Legal information</a></p></div><a target="_blank" href="https://web.archive.org/web/20140802161607/http://nodejs.org/" class="footer__node">node.js</a></div></div></footer><script src="//web.archive.org/web/20140802161607js_/http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script><script>window.jQuery || document.write('<script src="/static/js/lib/vendor/jquery-1.10.2.min.js"><\/script>')
+</script><script src="/web/20140802161607js_/http://clock.co.uk/static/js/build/6aeb77f11a7386e54e945de83e072c88/index.js"></script></body></html><!--
+     FILE ARCHIVED ON 16:16:07 Aug 02, 2014 AND RETRIEVED FROM THE
+     INTERNET ARCHIVE ON 02:52:41 Apr 16, 2018.
+     JAVASCRIPT APPENDED BY WAYBACK MACHINE, COPYRIGHT INTERNET ARCHIVE.
+
+     ALL OTHER CONTENT MAY ALSO BE PROTECTED BY COPYRIGHT (17 U.S.C.
+     SECTION 108(a)(3)).
+-->
+<!--
+playback timings (ms):
+  LoadShardBlock: 119.102 (3)
+  esindex: 0.006
+  captures_list: 137.063
+  CDXLines.iter: 13.371 (3)
+  PetaboxLoader3.datanode: 45.474 (4)
+  exclusion.robots: 0.195
+  exclusion.robots.policy: 0.17
+  RedisCDXSource: 0.873
+  PetaboxLoader3.resolve: 67.829
+  load_resource: 85.282
+-->

@@ -1,0 +1,24 @@
+#!/bin/bash
+
+for url in https://gnunet.org/git/ https://git.osmocom.org/
+do
+	curl -L "$url" | sed -ne "s/.*title='\([^']*\.git\)'.*/\1/p" |
+	while read repo
+	do
+		remote="$url"/"$repo"
+		group="${url#*//}"
+		group="${group%%/*}"
+		mkdir -p cgit/"$group"
+		path=cgit/"$group"/"${repo%.git}"
+		git clone "$remote" "$path"
+		pushd "$path"
+		git pull || {
+			cd ..
+			rm -rf "$path"
+			git clone "$remote" "$path"
+			cd "$path"
+			git pull
+		}
+		popd
+	done
+done

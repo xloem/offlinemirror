@@ -1,0 +1,16 @@
+#!/usr/bin/debmirror --config-file
+#$verbose=1;
+$progress=1;
+$getcontents=1;
+$diff_mode="use";
+
+$mirrordir="raspbian";
+$host="mirrors.lug.mtu.edu";
+$remoteroot="raspbian/raspbian";
+$download_method="https";
+@dists="stretch";
+@sections="main,contrib,non-free,rpi";
+@arches="armhf";
+$keyring="trustedkeys.gpg";
+
+

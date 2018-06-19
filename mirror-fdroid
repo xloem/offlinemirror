@@ -1,0 +1,6 @@
+#!/bin/bash
+
+repo=f-droid.org/repo
+wget --mirror https://${repo}/index.{jar,xml}
+
+sed -e 's!<apkname>\([^<]*\)</apkname>!'"\nhttps://${repo}/"'\1\n!g' ${repo}/index.xml | grep '\.apk$' | while read apk; do wget --mirror "$apk"; done
