@@ -5,6 +5,6 @@ pushd web
 httrack --update --continue
 for url in http://hansvi.be/wordpress/?p=91 blog.dxers.info https://www.arrl.org/power-line-noise-mitigation-handbook-for-naval-and-other-receiving-sites https://www.rowetel.com/?p=5867
 do
-	httrack "$url"
+	httrack --continue "$url"
 done
 popd
